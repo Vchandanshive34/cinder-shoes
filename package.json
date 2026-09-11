@@ -1,0 +1,10 @@
+{
+  "name": "cinder-shoe-hero",
+  "version": "1.0.0",
+  "description": "Scroll-animated 3D shoe landing page, built with three.js.",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx live-server --port=5500"
+  },
+  "license": "MIT"
+}
