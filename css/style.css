@@ -1,0 +1,100 @@
+:root{
+  --asphalt:#2b2e33;
+  --asphalt-deep:#1f2226;
+  --chalk:#f3f1ec;
+  --chalk-dim:#c7c4bc;
+  --track-red:#e8432c;
+  --track-yellow:#f4c430;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--asphalt-deep);color:var(--chalk);
+  font-family:'Inter',sans-serif; overflow-x:hidden; scroll-behavior:smooth;}
+::selection{background:var(--track-red); color:var(--chalk);}
+
+h1,h2,h3{font-family:'Barlow Condensed',sans-serif; font-weight:700; margin:0; line-height:0.95;}
+
+a.btn, button.btn{
+  font-family:'Inter',sans-serif; font-weight:500; font-size:15px;
+  background:var(--track-red); color:var(--chalk); border:none;
+  padding:14px 26px; border-radius:2px; cursor:pointer;
+  display:inline-block; text-decoration:none;
+  transition:transform 0.15s ease, background 0.15s ease;
+}
+a.btn:hover, button.btn:hover{ background:#ff5a3d; transform:translateY(-2px); }
+a.btn.ghost{ background:transparent; border:1px solid rgba(243,241,236,0.4); }
+a.btn.ghost:hover{ background:rgba(243,241,236,0.08); border-color:var(--chalk); }
+
+#canvas-stage{
+  position:fixed; inset:0; width:100%; height:100vh; z-index:1;
+}
+#canvas-stage canvas{ display:block; width:100%; height:100%; }
+
+.scroll-track{ position:relative; z-index:2; }
+
+nav{
+  position:fixed; top:0; left:0; right:0; z-index:10;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:26px 48px; pointer-events:none;
+}
+nav .mark{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:22px; letter-spacing:0.01em; pointer-events:auto; }
+nav .mark span{ color:var(--track-red); }
+nav .cta{ pointer-events:auto; }
+
+section{
+  min-height:100vh; display:flex; align-items:center;
+  padding:0 48px;
+}
+
+.panel{
+  max-width:460px; padding:36px 40px;
+  background:rgba(31,34,38,0.55);
+  backdrop-filter:blur(6px);
+  border-left:2px solid var(--track-red);
+}
+.panel.right{ margin-left:auto; border-left:none; border-right:2px solid var(--track-yellow); text-align:right; }
+
+.kicker{ font-size:14px; color:var(--track-yellow); font-weight:500; margin-bottom:14px; }
+.panel.right .kicker{ color:var(--track-red); }
+
+#hero h1{ font-size:clamp(56px, 9vw, 108px); }
+#hero .sub{ font-size:18px; color:var(--chalk-dim); margin:20px 0 28px; max-width:36ch; line-height:1.5; }
+#hero .actions{ display:flex; gap:14px; }
+
+section h2{ font-size:clamp(38px, 5vw, 58px); margin-bottom:16px; }
+section p{ font-size:16px; line-height:1.6; color:var(--chalk-dim); }
+
+.specs{ margin-top:22px; display:flex; flex-direction:column; gap:10px; }
+.panel.right .specs{ align-items:flex-end; }
+.specs .row{ display:flex; gap:14px; font-size:14px; color:var(--chalk); }
+.panel.right .specs .row{ flex-direction:row-reverse; }
+.specs .row .num{ color:var(--track-yellow); font-family:'Barlow Condensed',sans-serif; font-weight:600; width:26px; }
+
+#cta-section{ justify-content:center; text-align:center; }
+#cta-section .panel{ max-width:520px; margin:0 auto; border-left:none; border-top:2px solid var(--track-red); text-align:center; }
+#cta-section .actions{ display:flex; gap:14px; justify-content:center; margin-top:26px; }
+
+.scroll-cue{
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  z-index:10; display:flex; flex-direction:column; align-items:center; gap:8px;
+  font-size:12px; color:var(--chalk-dim); letter-spacing:0.05em;
+  opacity:1; transition:opacity 0.4s ease; pointer-events:none;
+}
+.scroll-cue .line{ width:1px; height:34px; background:linear-gradient(var(--track-red), transparent); }
+
+footer{
+  position:relative; z-index:2; padding:60px 48px 40px;
+  color:var(--chalk-dim); font-size:13px; display:flex; justify-content:space-between;
+  border-top:1px solid rgba(243,241,236,0.12);
+}
+
+@media (max-width: 720px){
+  section{ padding:0 22px; }
+  .panel, .panel.right{ max-width:100%; margin:0; text-align:left; border-right:none; border-left:2px solid var(--track-red); padding:26px 24px;}
+  .panel.right .specs{ align-items:flex-start; }
+  .panel.right .specs .row{ flex-direction:row; }
+  nav{ padding:20px 22px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  html,body{ scroll-behavior:auto; }
+}
