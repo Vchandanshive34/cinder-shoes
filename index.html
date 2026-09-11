@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cinder · 02 — Track shoe</title>
+<meta name="description" content="Cinder · 02 — an original track shoe design, presented with a scroll-animated 3D model." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="canvas-stage"></div>
+
+<nav>
+  <div class="mark">CINDER<span>·02</span></div>
+  <a class="btn ghost cta" href="#cta-section">Notify me</a>
+</nav>
+
+<div class="scroll-cue" id="scrollCue">
+  <span>SCROLL</span>
+  <div class="line"></div>
+</div>
+
+<div class="scroll-track">
+
+  <section id="hero">
+    <div class="panel">
+      <div class="kicker">Track 02 · Drop 004</div>
+      <h1>Built<br/>for the<br/>break.</h1>
+      <p class="sub">A midsole tuned for the first three steps out of the blocks, wrapped in a knit that moves like it isn't there.</p>
+      <div class="actions">
+        <a class="btn" href="#cta-section">Reserve a pair</a>
+        <a class="btn ghost" href="#sole">See the build</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="sole">
+    <div class="panel">
+      <div class="kicker">The sole unit</div>
+      <h2>A shape cut<br/>from the stride.</h2>
+      <p>The outsole silhouette is drawn from a single foot-strike scan — narrow at the waist, wide through the forefoot, with a lugged rubber pod under the heel.</p>
+      <div class="specs">
+        <div class="row"><span class="num">01</span><span>Molded rubber outsole, lugged heel pod</span></div>
+        <div class="row"><span class="num">02</span><span>Dual-density foam midsole</span></div>
+        <div class="row"><span class="num">03</span><span>8mm heel-to-toe drop</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="upper">
+    <div class="panel right">
+      <div class="kicker">The upper</div>
+      <h2>One knit,<br/>zero seams.</h2>
+      <p>The upper is engineered as a single piece — denser fibers wrap the midfoot for lockdown, looser ones open up across the toe box for the last mile. Eight eyelets, crossed lacing, no overlays to break in.</p>
+      <div class="specs">
+        <div class="row"><span class="num">04</span><span>Single-layer engineered knit</span></div>
+        <div class="row"><span class="num">05</span><span>Internal heel counter, pull tab</span></div>
+        <div class="row"><span class="num">06</span><span>190g, men's size 9</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta-section">
+    <div class="panel">
+      <div class="kicker">Releasing Spring</div>
+      <h2>Cinder · 02 drops soon.</h2>
+      <p>Leave your email and we'll send one message, the morning it releases — no earlier.</p>
+      <div class="actions">
+        <a class="btn" href="#hero">Notify me</a>
+        <a class="btn ghost" href="#hero">Back to top</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>Cinder Athletics — Track Division</span>
+  <span>Original concept design</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/shoe.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
