@@ -4,199 +4,155 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cinder 02 — Race Lab</title>
-<meta name="description" content="Cinder 02 — a scroll-driven product page for a carbon-plate racing shoe, with the 3D model generated procedurally in the browser.">
+<meta name="description" content="Cinder 02 — a scroll-driven product page for a carbon-plate racing shoe.">
 <meta name="theme-color" content="#05070B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305070B'/%3E%3Cpath d='M16 5 L27 25 H5 Z' fill='none' stroke='%23FF6A1B' stroke-width='2.4' stroke-linejoin='round'/%3E%3Cpath d='M16 13 L21.5 23.5 H10.5 Z' fill='%23FF6A1B'/%3E%3C/svg%3E">
-
+<link rel="preload" as="image" href="assets/shoe.webp" imagesrcset="assets/shoe-sm.webp 760w, assets/shoe.webp 1400w">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Cinder 02 — Race Lab">
-<meta property="og:description" content="Cinder 02 — a scroll-driven product page for a carbon-plate racing shoe, with the 3D model generated procedurally in the browser.">
+<meta property="og:description" content="Cinder 02 — a scroll-driven product page for a carbon-plate racing shoe.">
 <meta property="og:url" content="https://vchandanshive34.github.io/cinder-shoes/">
+<meta property="og:image" content="https://vchandanshive34.github.io/cinder-shoes/assets/shoe.webp">
 <meta name="twitter:card" content="summary_large_image">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
 <style>
-/* A committed single-theme design: this page is a lit stage, and it holds the
-   same look on either host ground. Every colour is painted explicitly. */
+/* A committed dark stage. Every colour is painted explicitly so the page holds
+   its look regardless of the viewer's system theme. */
 :root{
-  --void:#05070B;
-  --void-2:#080C12;
-  --glass:rgba(255,255,255,.045);
-  --glass-2:rgba(255,255,255,.075);
-  --edge:rgba(255,255,255,.10);
-  --edge-2:rgba(255,255,255,.18);
-  --ink:#F4F7FA;
-  --ink-2:#B4C0CB;
-  --muted:#7D8B99;
-  --ember:#FF6A1B;
-  --ember-hot:#FFB23D;
-  --ember-dim:rgba(255,106,27,.16);
-  --ion:#3BA9FF;
-  --violet:#7C5CFF;
+  --void:#05070B; --glass:rgba(255,255,255,.045); --edge:rgba(255,255,255,.10);
+  --edge-2:rgba(255,255,255,.18); --ink:#F4F7FA; --ink-2:#B4C0CB; --muted:#7D8B99;
+  --ember:#FF6A1B; --ember-hot:#FFB23D; --ember-dim:rgba(255,106,27,.16); --ion:#3BA9FF;
 }
 *{box-sizing:border-box}
 html{color-scheme:dark}
 body{
-  margin:0;
-  background:
-    radial-gradient(90% 55% at 62% 34%, rgba(255,106,27,.10) 0%, transparent 62%),
-    radial-gradient(70% 50% at 20% 78%, rgba(59,169,255,.07) 0%, transparent 64%),
-    var(--void);
-  color:var(--ink);
+  margin:0;background:var(--void);color:var(--ink);
   font-family:"Instrument Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size:16px;line-height:1.55;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
-h1,h2{
-  font-family:Archivo,"Arial Narrow",Helvetica,sans-serif;
-  font-variation-settings:'wdth' 86,'wght' 900;
-  text-transform:uppercase;line-height:.88;letter-spacing:-.012em;
-  text-wrap:balance;margin:0;
-}
+h1,h2{font-family:Archivo,"Arial Narrow",Helvetica,sans-serif;
+  font-variation-settings:'wdth' 86,'wght' 900;text-transform:uppercase;
+  line-height:.88;letter-spacing:-.012em;text-wrap:balance;margin:0}
 .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--ember);outline-offset:3px}
 
 /* ---------- stage ---------- */
-#stage{position:fixed;inset:0;z-index:0;pointer-events:none}
-#gl{display:block;width:100%;height:100%}
-#fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:24px}
-#fallback svg{width:min(74vw,620px);height:auto;filter:drop-shadow(0 0 42px rgba(255,106,27,.45))}
-body.nogl #fallback{display:flex}
+#stage{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#sky{position:absolute;inset:0;width:100%;height:100%;display:block}
+.glow{position:absolute;inset:0;
+  background:
+    radial-gradient(42% 46% at 58% 52%, rgba(255,106,27,.30) 0%, transparent 68%),
+    radial-gradient(30% 34% at 34% 66%, rgba(255,138,61,.16) 0%, transparent 70%),
+    radial-gradient(38% 40% at 74% 34%, rgba(59,169,255,.13) 0%, transparent 72%);
+  mix-blend-mode:screen;transition:opacity .5s}
+.swirls{position:absolute;left:50%;top:50%;width:min(140vmin,1500px);aspect-ratio:1;
+  translate:-50% -50%;mix-blend-mode:screen;opacity:.85}
+.swirls svg{width:100%;height:100%;display:block}
+.swirls .a{transform-origin:50% 50%;animation:spin 34s linear infinite}
+.swirls .b{transform-origin:50% 50%;animation:spin 52s linear infinite reverse}
+.swirls .c{transform-origin:50% 50%;animation:spin 78s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#shoeWrap{position:absolute;left:50%;top:50%;width:min(78vw,860px);
+  translate:-50% -50%;will-change:transform;filter:drop-shadow(0 42px 46px rgba(0,0,0,.72))}
+#shoe{width:100%;height:auto;display:block}
+#callouts{position:absolute;left:50%;top:50%;width:min(78vw,860px);
+  translate:-50% -50%;opacity:0;transition:opacity .35s;will-change:transform,opacity}
+#callouts svg{width:100%;height:auto;display:block;overflow:visible}
+#callouts text{font-family:"IBM Plex Mono",monospace;font-size:19px;letter-spacing:.11em;
+  text-transform:uppercase;fill:var(--ink)}
+#callouts .lbl{font-size:15px;fill:var(--muted);letter-spacing:.09em}
+@media (prefers-reduced-motion:reduce){.swirls .a,.swirls .b,.swirls .c{animation:none}}
 
 /* ---------- chrome ---------- */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:40;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:14px max(16px,3vw);
-  border-bottom:1px solid var(--edge);
-  background:rgba(5,7,11,.62);
-  backdrop-filter:blur(18px) saturate(1.3);
-  -webkit-backdrop-filter:blur(18px) saturate(1.3);
-}
-.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;padding:14px max(16px,3vw);
+  border-bottom:1px solid var(--edge);background:rgba(5,7,11,.62);
+  backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
+.brand{display:flex;align-items:center;gap:11px}
 .brand svg{width:28px;height:28px;flex:none;filter:drop-shadow(0 0 10px rgba(255,106,27,.55))}
-.brand .wordmark{
-  font-family:Archivo,sans-serif;font-variation-settings:'wdth' 112,'wght' 900;
-  font-size:19px;letter-spacing:.13em;text-transform:uppercase;
-}
+.brand .wordmark{font-family:Archivo,sans-serif;font-variation-settings:'wdth' 112,'wght' 900;
+  font-size:19px;letter-spacing:.13em;text-transform:uppercase}
 .topbar nav{display:flex;gap:26px;font-size:11.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--muted)}
 .topbar nav a{text-decoration:none;transition:color .18s}
 .topbar nav a:hover,.topbar nav a:focus-visible{color:var(--ember)}
-.tag{
-  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;
-  padding:7px 13px;border:1px solid var(--edge);border-radius:999px;color:var(--ink-2);
-  background:var(--glass);
-}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;padding:7px 13px;
+  border:1px solid var(--edge);border-radius:999px;color:var(--ink-2);background:var(--glass)}
 @media (max-width:900px){.topbar nav{display:none}}
 @media (max-width:640px){.tag{display:none}}
-
-/* left vertical rail — the page's real chapters */
-.rail{
-  position:fixed;left:max(12px,1.8vw);top:50%;transform:translateY(-50%);
-  z-index:30;display:flex;flex-direction:column;gap:30px;align-items:center;
-}
-.rail a{
-  writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
-  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.26em;
-  text-transform:uppercase;color:var(--muted);text-decoration:none;
-  padding:6px 3px;transition:color .2s;
-}
+.rail{position:fixed;left:max(12px,1.8vw);top:50%;transform:translateY(-50%);z-index:30;
+  display:flex;flex-direction:column;gap:30px;align-items:center}
+.rail a{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;padding:6px 3px;transition:color .2s}
 .rail a:hover,.rail a[aria-current="true"]{color:var(--ember)}
 .rail .tick{width:1px;height:54px;background:linear-gradient(var(--edge),transparent)}
 @media (max-width:1100px){.rail{display:none}}
 
 /* ---------- layout ---------- */
 main{position:relative;z-index:10}
-.chapter{
-  min-height:clamp(600px,100svh,1080px);
-  display:grid;align-items:center;
-  padding:110px max(16px,3vw) 76px;
-}
+.chapter{min-height:clamp(600px,100svh,1080px);display:grid;align-items:center;
+  padding:110px max(16px,3vw) 76px}
 @media (min-width:1100px){.chapter{padding-left:96px}}
 .inner{width:100%;max-width:1280px;margin-inline:auto;display:grid;gap:26px}
 .right .inner{justify-items:end}
-.panel{
-  max-width:620px;display:flex;flex-direction:column;gap:20px;
-  background:linear-gradient(180deg,rgba(12,17,24,.80),rgba(7,10,15,.66));
-  border:1px solid var(--edge);
-  padding:clamp(20px,2.3vw,34px);
+.panel{max-width:600px;display:flex;flex-direction:column;gap:20px;
+  background:linear-gradient(180deg,rgba(12,17,24,.84),rgba(7,10,15,.70));
+  border:1px solid var(--edge);padding:clamp(20px,2.3vw,34px);
   box-shadow:0 30px 70px -40px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.05);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-}
-.eyebrow{
-  display:flex;align-items:center;gap:11px;
-  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--ember);
-}
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.eyebrow{display:flex;align-items:center;gap:11px;font-family:"IBM Plex Mono",monospace;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ember)}
 .eyebrow .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--ember-dim),transparent);min-width:20px}
-.lede{color:var(--ink-2);max-width:54ch}
-.note{font-size:13px;color:var(--muted);max-width:58ch}
-
-#hero h1{font-size:clamp(40px,7.6vw,96px)}
+.lede{color:var(--ink-2);max-width:52ch}
+.note{font-size:13px;color:var(--muted);max-width:56ch}
+#hero h1{font-size:clamp(40px,7.4vw,94px)}
 #hero h1 .hot{color:var(--ember);text-shadow:0 0 38px rgba(255,106,27,.55)}
 .sub{color:var(--ink-2);max-width:40ch;font-size:clamp(15px,1.3vw,18px)}
-
 .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
-.btn{
-  display:inline-flex;align-items:center;gap:12px;cursor:pointer;
-  font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
-  padding:14px 24px;border-radius:999px;
-  border:1px solid var(--ember);color:var(--ember);background:rgba(255,106,27,.08);
-  text-decoration:none;
-  box-shadow:0 0 0 1px rgba(255,106,27,.14), 0 0 28px -6px rgba(255,106,27,.55), inset 0 0 20px -8px rgba(255,106,27,.6);
-  transition:background .2s,color .2s,box-shadow .2s;
-}
-.btn:hover,.btn:focus-visible{
-  background:var(--ember);color:#120600;
-  box-shadow:0 0 0 1px rgba(255,178,61,.5), 0 0 44px -4px rgba(255,106,27,.85);
-}
+.btn{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font-family:"IBM Plex Mono",monospace;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:14px 24px;border-radius:999px;
+  border:1px solid var(--ember);color:var(--ember);background:rgba(255,106,27,.08);text-decoration:none;
+  box-shadow:0 0 28px -6px rgba(255,106,27,.55), inset 0 0 20px -8px rgba(255,106,27,.6);
+  transition:background .2s,color .2s,box-shadow .2s}
+.btn:hover,.btn:focus-visible{background:var(--ember);color:#120600;
+  box-shadow:0 0 44px -4px rgba(255,106,27,.85)}
 .btn svg{width:14px;height:14px}
-.link{
-  font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;
-  color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--edge-2);padding-bottom:3px;
-  transition:color .18s,border-color .18s;
-}
+.link{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--edge-2);padding-bottom:3px;transition:.18s}
 .link:hover,.link:focus-visible{color:var(--ink);border-color:var(--ember)}
-
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{
-  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;
-  padding:6px 11px;border:1px solid var(--edge);color:var(--ink-2);background:var(--glass);
-}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;padding:6px 11px;
+  border:1px solid var(--edge);color:var(--ink-2);background:var(--glass)}
 .chip.hot{border-color:rgba(255,106,27,.45);color:var(--ember-hot);background:var(--ember-dim)}
+.scroll-cue{display:flex;align-items:center;gap:11px;color:var(--muted);font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;letter-spacing:.2em;text-transform:uppercase}
+.scroll-cue .track{width:52px;height:1px;background:var(--edge-2);position:relative;overflow:hidden}
+.scroll-cue .track::after{content:"";position:absolute;inset:0;background:var(--ember);
+  transform-origin:left;animation:sweep 2.8s ease-in-out infinite}
+@keyframes sweep{0%{transform:scaleX(0)}45%{transform:scaleX(1)}100%{transform:scaleX(0);transform-origin:right}}
+@media (prefers-reduced-motion:reduce){.scroll-cue .track::after{animation:none;transform:scaleX(1)}}
 
-/* ---------- product card strip ---------- */
 #hero{align-items:stretch}
 #hero .inner{align-content:space-between;gap:34px}
-.strip{
-  width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;
-}
+.strip{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 @media (max-width:820px){.strip{grid-template-columns:1fr;gap:10px}}
-.card{
-  display:grid;grid-template-columns:1fr 104px;align-items:center;gap:12px;
-  text-align:left;cursor:pointer;font:inherit;color:var(--ink);
-  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
-  border:1px solid var(--edge);padding:14px 16px;
-  transition:border-color .2s,background .2s,transform .2s;
-}
+.card{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;text-align:left;
+  cursor:pointer;font:inherit;color:var(--ink);border:1px solid var(--edge);padding:14px 16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));transition:.2s}
 .card:hover{border-color:var(--edge-2);transform:translateY(-2px)}
-.card[aria-pressed="true"]{
-  border-color:rgba(255,106,27,.6);
+.card[aria-pressed="true"]{border-color:rgba(255,106,27,.6);
   background:linear-gradient(180deg,rgba(255,106,27,.13),rgba(255,106,27,.03));
-  box-shadow:0 0 34px -12px rgba(255,106,27,.7);
-}
+  box-shadow:0 0 34px -12px rgba(255,106,27,.7)}
 .card .nm{display:block;font-family:Archivo,sans-serif;font-variation-settings:'wdth' 96,'wght' 800;
-  text-transform:uppercase;font-size:17px;letter-spacing:.01em;line-height:1.05}
-.card .meta{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;
-  color:var(--muted);margin-top:6px;letter-spacing:.04em}
-.card .meta b{color:var(--ember);font-weight:500}
-.card svg{width:104px;max-width:100%;height:auto;display:block}
-
-/* ---------- spec ---------- */
+  text-transform:uppercase;font-size:17px;line-height:1.05}
+.card .meta{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
+  margin-top:6px;letter-spacing:.04em}
+.card .sw{width:34px;height:34px;border:1px solid var(--edge-2);flex:none;position:relative}
+.card .sw i{position:absolute;left:0;right:0;bottom:0;height:34%}
 .dl{display:grid;grid-template-columns:1fr auto;gap:10px 18px;border-top:1px solid var(--edge);padding-top:16px}
 .dl dt{font-size:13.5px;color:var(--muted);margin:0}
 .dl dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:13px;text-align:right}
@@ -213,41 +169,59 @@ th,td{text-align:left;padding:11px 14px 11px 0;border-bottom:1px solid var(--edg
 th{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:500}
 td{font-size:14px}
 td.num{font-family:"IBM Plex Mono",monospace;text-align:right;padding-right:0}
-
 .price{display:flex;align-items:baseline;gap:12px}
 .price .big{font-family:Archivo,sans-serif;font-variation-settings:'wdth' 92,'wght' 900;
   font-size:clamp(42px,7vw,74px);line-height:1;color:var(--ember);text-shadow:0 0 34px rgba(255,106,27,.45)}
 .price .cur{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);letter-spacing:.12em}
 .sizes{display:flex;flex-wrap:wrap;gap:7px}
-.size{font-family:"IBM Plex Mono",monospace;font-size:12.5px;padding:9px 12px;
-  border:1px solid var(--edge);background:var(--glass);color:var(--ink);cursor:pointer;transition:.16s}
+.size{font-family:"IBM Plex Mono",monospace;font-size:12.5px;padding:9px 12px;border:1px solid var(--edge);
+  background:var(--glass);color:var(--ink);cursor:pointer;transition:.16s}
 .size:hover{border-color:var(--edge-2)}
 .size[aria-pressed="true"]{background:var(--ember);border-color:var(--ember);color:#120600}
 .size[disabled]{opacity:.3;cursor:not-allowed;text-decoration:line-through}
-
-.scroll-cue{display:flex;align-items:center;gap:11px;color:var(--muted);
-  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase}
-.scroll-cue .track{width:52px;height:1px;background:var(--edge-2);position:relative;overflow:hidden}
-.scroll-cue .track::after{content:"";position:absolute;inset:0;background:var(--ember);
-  transform-origin:left;animation:sweep 2.8s ease-in-out infinite}
-@keyframes sweep{0%{transform:scaleX(0)}45%{transform:scaleX(1)}100%{transform:scaleX(0);transform-origin:right}}
-@media (prefers-reduced-motion:reduce){.scroll-cue .track::after{animation:none;transform:scaleX(1)}}
-
 footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:rgba(5,7,11,.7);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  padding:30px max(16px,3vw);display:flex;flex-wrap:wrap;gap:14px 28px;
-  align-items:baseline;justify-content:space-between;font-size:12px;color:var(--muted)}
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:30px max(16px,3vw);
+  display:flex;flex-wrap:wrap;gap:14px 28px;align-items:baseline;justify-content:space-between;
+  font-size:12px;color:var(--muted)}
 </style>
-<noscript><style>#fallback{display:flex !important}</style></noscript>
 </head>
 <body>
 <div id="stage" aria-hidden="true">
-  <canvas id="gl"></canvas>
-  <div id="fallback">
-    <svg viewBox="0 0 220 104" role="img" aria-label="Side profile of the Cinder 02">
-      <path d="M3.1 70.1 L 5.8 70.3 L 8.4 70.3 L 11.1 70.1 L 13.8 69.4 L 16.5 68.9 L 19.1 68.8 L 21.8 69.1 L 24.5 69.3 L 27.2 69.4 L 29.8 69.3 L 32.5 69.3 L 35.2 69.3 L 37.8 69.3 L 40.5 69.3 L 43.2 69.3 L 45.9 69.4 L 48.5 69.5 L 51.2 69.6 L 53.9 69.8 L 56.5 69.9 L 59.2 70.1 L 61.9 70.3 L 64.6 70.5 L 67.2 70.7 L 69.9 70.9 L 72.6 71.0 L 75.3 71.2 L 77.9 71.3 L 80.6 71.5 L 83.3 71.6 L 85.9 71.7 L 88.6 71.9 L 91.3 72.0 L 94.0 72.2 L 96.6 72.3 L 99.3 72.4 L 102.0 72.6 L 104.7 72.7 L 107.3 72.9 L 110.0 73.0 L 112.7 73.2 L 115.3 73.3 L 118.0 73.5 L 120.7 73.7 L 123.4 73.8 L 126.0 74.0 L 128.7 74.2 L 131.4 74.4 L 134.1 74.6 L 136.7 74.8 L 139.4 74.9 L 142.1 75.1 L 144.7 75.3 L 147.4 75.4 L 150.1 75.6 L 152.8 75.7 L 155.4 75.8 L 158.1 76.0 L 160.8 76.1 L 163.5 76.2 L 166.1 76.4 L 168.8 76.5 L 171.5 76.5 L 174.1 76.5 L 176.8 76.5 L 179.5 76.4 L 182.2 76.4 L 184.8 76.3 L 187.5 76.3 L 190.2 76.2 L 192.8 76.1 L 195.5 75.9 L 198.2 75.7 L 200.9 75.5 L 203.5 75.3 L 206.2 75.1 L 208.9 74.9 L 211.6 74.9 L 214.2 75.1 L 216.9 75.5 L 216.9 89.3 L 214.2 90.1 L 211.6 90.9 L 208.9 91.7 L 206.2 92.5 L 203.5 93.3 L 200.9 94.1 L 198.2 94.9 L 195.5 95.6 L 192.8 96.3 L 190.2 96.9 L 187.5 97.5 L 184.8 98.0 L 182.2 98.5 L 179.5 98.9 L 176.8 99.4 L 174.1 99.7 L 171.5 100.1 L 168.8 100.4 L 166.1 100.6 L 163.5 100.7 L 160.8 100.9 L 158.1 101.0 L 155.4 101.2 L 152.8 101.3 L 150.1 101.4 L 147.4 101.5 L 144.7 101.6 L 142.1 101.6 L 139.4 101.7 L 136.7 101.7 L 134.1 101.7 L 131.4 101.7 L 128.7 101.7 L 126.0 101.7 L 123.4 101.7 L 120.7 101.7 L 118.0 101.7 L 115.3 101.7 L 112.7 101.7 L 110.0 101.7 L 107.3 101.7 L 104.7 101.7 L 102.0 101.7 L 99.3 101.7 L 96.6 101.7 L 94.0 101.7 L 91.3 101.7 L 88.6 101.7 L 85.9 101.7 L 83.3 101.7 L 80.6 101.7 L 77.9 101.7 L 75.3 101.7 L 72.6 101.7 L 69.9 101.7 L 67.2 101.7 L 64.6 101.7 L 61.9 101.7 L 59.2 101.7 L 56.5 101.7 L 53.9 101.7 L 51.2 101.7 L 48.5 101.7 L 45.9 101.7 L 43.2 101.7 L 40.5 101.7 L 37.8 101.7 L 35.2 101.7 L 32.5 101.7 L 29.8 101.7 L 27.2 101.7 L 24.5 101.5 L 21.8 101.3 L 19.1 100.9 L 16.5 100.4 L 13.8 99.8 L 11.1 99.1 L 8.4 97.9 L 5.8 96.3 L 3.1 94.9 Z" fill="#232A34"/>
-      <path d="M3.1 31.0 L 5.8 27.7 L 8.4 24.6 L 11.1 22.1 L 13.8 19.5 L 16.5 17.8 L 19.1 17.6 L 21.8 18.6 L 24.5 19.8 L 27.2 21.1 L 29.8 22.9 L 32.5 25.0 L 35.2 27.0 L 37.8 29.1 L 40.5 30.9 L 43.2 32.4 L 45.9 33.6 L 48.5 34.7 L 51.2 35.6 L 53.9 36.3 L 56.5 36.9 L 59.2 37.4 L 61.9 37.9 L 64.6 38.4 L 67.2 38.9 L 69.9 39.3 L 72.6 39.6 L 75.3 39.7 L 77.9 39.7 L 80.6 39.6 L 83.3 39.5 L 85.9 39.4 L 88.6 39.3 L 91.3 39.1 L 94.0 38.9 L 96.6 38.6 L 99.3 38.4 L 102.0 38.2 L 104.7 38.1 L 107.3 37.9 L 110.0 37.7 L 112.7 37.7 L 115.3 37.9 L 118.0 38.2 L 120.7 38.7 L 123.4 39.4 L 126.0 40.0 L 128.7 40.9 L 131.4 42.0 L 134.1 43.2 L 136.7 44.5 L 139.4 46.1 L 142.1 47.7 L 144.7 49.3 L 147.4 50.7 L 150.1 52.0 L 152.8 53.2 L 155.4 54.4 L 158.1 55.5 L 160.8 56.6 L 163.5 57.6 L 166.1 58.6 L 168.8 59.5 L 171.5 60.3 L 174.1 61.0 L 176.8 61.6 L 179.5 62.1 L 182.2 62.7 L 184.8 63.3 L 187.5 63.9 L 190.2 64.5 L 192.8 65.0 L 195.5 65.5 L 198.2 66.1 L 200.9 66.7 L 203.5 67.3 L 206.2 68.1 L 208.9 68.9 L 211.6 70.0 L 214.2 71.4 L 216.9 73.0 L 216.9 75.5 L 214.2 75.1 L 211.6 74.9 L 208.9 74.9 L 206.2 75.1 L 203.5 75.3 L 200.9 75.5 L 198.2 75.7 L 195.5 75.9 L 192.8 76.1 L 190.2 76.2 L 187.5 76.3 L 184.8 76.3 L 182.2 76.4 L 179.5 76.4 L 176.8 76.5 L 174.1 76.5 L 171.5 76.5 L 168.8 76.5 L 166.1 76.4 L 163.5 76.2 L 160.8 76.1 L 158.1 76.0 L 155.4 75.8 L 152.8 75.7 L 150.1 75.6 L 147.4 75.4 L 144.7 75.3 L 142.1 75.1 L 139.4 74.9 L 136.7 74.8 L 134.1 74.6 L 131.4 74.4 L 128.7 74.2 L 126.0 74.0 L 123.4 73.8 L 120.7 73.7 L 118.0 73.5 L 115.3 73.3 L 112.7 73.2 L 110.0 73.0 L 107.3 72.9 L 104.7 72.7 L 102.0 72.6 L 99.3 72.4 L 96.6 72.3 L 94.0 72.2 L 91.3 72.0 L 88.6 71.9 L 85.9 71.7 L 83.3 71.6 L 80.6 71.5 L 77.9 71.3 L 75.3 71.2 L 72.6 71.0 L 69.9 70.9 L 67.2 70.7 L 64.6 70.5 L 61.9 70.3 L 59.2 70.1 L 56.5 69.9 L 53.9 69.8 L 51.2 69.6 L 48.5 69.5 L 45.9 69.4 L 43.2 69.3 L 40.5 69.3 L 37.8 69.3 L 35.2 69.3 L 32.5 69.3 L 29.8 69.3 L 27.2 69.4 L 24.5 69.3 L 21.8 69.1 L 19.1 68.8 L 16.5 68.9 L 13.8 69.4 L 11.1 70.1 L 8.4 70.3 L 5.8 70.3 L 3.1 70.1 Z" fill="#151B23"/>
-      <path d="M6.2 83.9 L 9.7 85.1 L 13.1 85.5 L 16.6 85.7 L 20.0 86.1 L 23.5 86.5 L 27.0 86.7 L 30.4 86.7 L 33.9 86.7 L 37.3 86.7 L 40.8 86.7 L 44.3 86.7 L 47.7 86.8 L 51.2 86.8 L 54.6 86.9 L 58.1 87.0 L 61.6 87.1 L 65.0 87.1 L 68.5 87.2 L 71.9 87.3 L 75.4 87.4 L 78.9 87.5 L 82.3 87.5 L 85.8 87.6 L 89.2 87.7 L 92.7 87.7 L 96.2 87.8 L 99.6 87.9 L 103.1 88.0 L 106.5 88.0 L 110.0 88.1 L 113.5 88.2 L 116.9 88.3 L 120.4 88.3 L 123.8 88.4 L 127.3 88.5 L 130.8 88.6 L 134.2 88.7 L 137.7 88.8 L 141.1 88.9 L 144.6 88.9 L 148.1 88.9 L 151.5 88.9 L 155.0 88.9 L 158.4 88.8 L 161.9 88.8 L 165.4 88.7 L 168.8 88.6 L 172.3 88.4 L 175.7 88.1 L 179.2 87.7 L 182.7 87.3 L 186.1 86.9 L 189.6 86.5 L 193.0 85.9 L 196.5 85.3 L 200.0 84.5 L 203.4 83.8 L 206.9 83.1 L 210.3 82.4 L 213.8 81.8 L 213.8 80.1 L 210.3 80.7 L 206.9 81.4 L 203.4 82.2 L 200.0 82.9 L 196.5 83.6 L 193.0 84.3 L 189.6 84.8 L 186.1 85.3 L 182.7 85.7 L 179.2 86.1 L 175.7 86.5 L 172.3 86.8 L 168.8 87.0 L 165.4 87.1 L 161.9 87.1 L 158.4 87.2 L 155.0 87.2 L 151.5 87.3 L 148.1 87.3 L 144.6 87.3 L 141.1 87.2 L 137.7 87.2 L 134.2 87.1 L 130.8 87.0 L 127.3 86.9 L 123.8 86.8 L 120.4 86.7 L 116.9 86.6 L 113.5 86.5 L 110.0 86.5 L 106.5 86.4 L 103.1 86.3 L 99.6 86.3 L 96.2 86.2 L 92.7 86.1 L 89.2 86.1 L 85.8 86.0 L 82.3 85.9 L 78.9 85.8 L 75.4 85.8 L 71.9 85.7 L 68.5 85.6 L 65.0 85.5 L 61.6 85.4 L 58.1 85.3 L 54.6 85.3 L 51.2 85.2 L 47.7 85.1 L 44.3 85.1 L 40.8 85.1 L 37.3 85.1 L 33.9 85.1 L 30.4 85.1 L 27.0 85.1 L 23.5 84.9 L 20.0 84.5 L 16.6 84.1 L 13.1 83.9 L 9.7 83.5 L 6.2 82.3 Z" fill="#FF6A1B"/>
+  <canvas id="sky"></canvas>
+  <div class="glow" id="glow"></div>
+  <div class="swirls" id="swirls">
+    <svg viewBox="0 0 400 400" aria-hidden="true">
+      <defs><filter id="sb" x="-25%" y="-25%" width="150%" height="150%">
+        <feGaussianBlur stdDeviation="2.4"/></filter></defs>
+      <g filter="url(#sb)" fill="none">
+        <ellipse class="a" cx="200" cy="200" rx="168" ry="74" stroke="#FF6A1B" stroke-width="2.4" opacity=".55"/>
+        <ellipse class="b" cx="200" cy="200" rx="150" ry="104" stroke="#FFB23D" stroke-width="1.7" opacity=".38"
+                 transform="rotate(24 200 200)"/>
+        <ellipse class="c" cx="200" cy="200" rx="184" ry="52" stroke="#3BA9FF" stroke-width="1.5" opacity=".30"
+                 transform="rotate(-18 200 200)"/>
+      </g>
+    </svg>
+  </div>
+  <div id="shoeWrap">
+    <img id="shoe" alt="" width="1400" height="595" decoding="async"
+         src="assets/shoe.webp"
+         srcset="assets/shoe-sm.webp 760w, assets/shoe.webp 1400w"
+         sizes="(max-width:860px) 86vw, min(78vw,860px)">
+  </div>
+  <div id="callouts">
+    <svg viewBox="0 0 1400 595" aria-hidden="true">
+      <g stroke="var(--ember)" stroke-width="2" fill="none" opacity=".95">
+        <circle cx="330" cy="150" r="7"/><path d="M330 150 L330 66 L258 66"/>
+        <circle cx="700" cy="240" r="7"/><path d="M700 240 L700 26 L628 26"/>
+        <circle cx="880" cy="430" r="7"/><path d="M880 430 L880 630 L700 630"/>
+        <circle cx="380" cy="485" r="7"/><path d="M380 485 L380 700 L300 700"/>
+      </g>
+      <g text-anchor="end">
+        <text x="248" y="62">A · Heel counter</text><text class="lbl" x="248" y="84">TPU, 18° bevel</text>
+        <text x="618" y="22">B · Knit upper</text><text class="lbl" x="618" y="44">Monofilament, 41 g</text>
+        <text x="690" y="626">C · Carbon plate</text><text class="lbl" x="690" y="648">0.9 mm, full length</text>
+        <text x="290" y="696">D · Midsole</text><text class="lbl" x="290" y="718">PEBA, 39.5 mm</text>
+      </g>
     </svg>
   </div>
 </div>
@@ -261,21 +235,16 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
     <span class="wordmark">Cinder</span>
   </div>
   <nav>
-    <a href="#profile">Technology</a>
-    <a href="#plate">Build</a>
-    <a href="#colorway">Materials</a>
-    <a href="#spec">Spec</a>
+    <a href="#profile">Technology</a><a href="#build">Build</a>
+    <a href="#colourway">Colourways</a><a href="#spec">Spec</a><a href="store.html">Shop</a>
   </nav>
   <span class="tag mono">Drop 004 · SS26</span>
 </header>
 
 <div class="rail">
-  <a href="#hero" data-rail="0">Collection</a>
-  <span class="tick"></span>
-  <a href="#profile" data-rail="1">Technology</a>
-  <span class="tick"></span>
-  <a href="#colorway" data-rail="3">Materials</a>
-  <span class="tick"></span>
+  <a href="#hero" data-rail="0">Collection</a><span class="tick"></span>
+  <a href="#profile" data-rail="1">Technology</a><span class="tick"></span>
+  <a href="#colourway" data-rail="3">Materials</a><span class="tick"></span>
   <a href="#order" data-rail="5">Reserve</a>
 </div>
 
@@ -287,25 +256,20 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
         <h1>Built for<br>the <span class="hot">break.</span></h1>
         <p class="sub">A midsole tuned for the first three steps out of the blocks, wrapped in a knit that moves like it isn't there.</p>
         <div class="chips">
-          <span class="chip mono">39.5 / 31.5 mm</span>
-          <span class="chip mono">8 mm drop</span>
-          <span class="chip mono">198 g</span>
-          <span class="chip mono hot">84.2% return</span>
+          <span class="chip mono">39.5 / 31.5 mm</span><span class="chip mono">8 mm drop</span>
+          <span class="chip mono">198 g</span><span class="chip mono hot">84.2% return</span>
         </div>
         <div class="cta-row">
           <a class="btn" href="#order">Reserve a pair
             <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M2 8h11M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-          <a class="link" href="#plate">See the build</a>
+              <path d="M2 8h11M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a class="link" href="#build">See the build</a>
         </div>
-        <div class="scroll-cue"><span class="track"></span><span>Scroll to rotate</span></div>
+        <div class="scroll-cue"><span class="track"></span><span>Scroll to explore</span></div>
       </div>
       <div class="strip" id="strip" role="group" aria-label="Choose a colourway"></div>
     </div>
   </section>
-
 
   <section class="chapter" id="profile">
     <div class="inner">
@@ -325,28 +289,28 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
     </div>
   </section>
 
-  <section class="chapter right" id="plate">
+  <section class="chapter right" id="build">
     <div class="inner">
       <div class="panel">
         <div class="eyebrow"><span>02 — Build</span><span class="rule"></span></div>
         <h2 style="font-size:clamp(30px,4.6vw,58px)">Four layers, one spring</h2>
-        <p class="lede">Keep scrolling and it comes apart. The plate is sandwiched at 38% of foam height — low enough to resist bending, high enough that the top layer still compresses under the forefoot.</p>
+        <p class="lede">The plate is sandwiched at 38% of foam height — low enough to resist bending, high enough that the top layer still compresses under the forefoot. The callouts on the shoe mark each layer.</p>
         <ul class="parts">
-          <li><span class="k">A</span><span class="n">Monofilament warp knit upper</span><span class="v">41 g</span></li>
-          <li><span class="k">B</span><span class="n">Supercritical PEBA, upper density</span><span class="v">0.11 g/cm³</span></li>
+          <li><span class="k">A</span><span class="n">TPU heel counter, 18° bevel</span><span class="v">— </span></li>
+          <li><span class="k">B</span><span class="n">Monofilament warp knit upper</span><span class="v">41 g</span></li>
           <li><span class="k">C</span><span class="n">Unidirectional carbon plate</span><span class="v">0.9 mm</span></li>
-          <li><span class="k">D</span><span class="n">Abraded rubber pods, 38% coverage</span><span class="v">1.2 mm</span></li>
+          <li><span class="k">D</span><span class="n">Supercritical PEBA midsole</span><span class="v">39.5 mm</span></li>
         </ul>
       </div>
     </div>
   </section>
 
-  <section class="chapter right" id="colorway">
+  <section class="chapter right" id="colourway">
     <div class="inner">
       <div class="panel">
         <div class="eyebrow"><span>03 — Materials</span><span class="rule"></span></div>
         <h2 style="font-size:clamp(30px,4.6vw,58px)">Three finishes</h2>
-        <p class="lede">Pick one from the strip up top and the knit, midsole, collar and blade repaint on the model as you choose. Race day gets Ember; the blackout mule is what the lab actually trains in.</p>
+        <p class="lede">Pick one from the strip in the hero and the shot up top swaps to it.</p>
         <p class="note" id="wayNote"></p>
         <div class="cta-row"><a class="link" href="#spec">Full spec sheet</a></div>
       </div>
@@ -355,24 +319,21 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
 
   <section class="chapter" id="spec">
     <div class="inner">
-      <div class="panel" style="max-width:680px">
+      <div class="panel" style="max-width:670px">
         <div class="eyebrow"><span>04 — Spec sheet</span><span class="rule"></span></div>
         <h2 style="font-size:clamp(30px,4.6vw,58px)">Everything measured</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Measurement</th><th>Method</th><th style="text-align:right">Value</th></tr></thead>
-            <tbody>
-              <tr><td>Mass, US M9</td><td>Single shoe, laced</td><td class="num">198 g</td></tr>
-              <tr><td>Energy return</td><td>30 Hz cyclic compression</td><td class="num">84.2 %</td></tr>
-              <tr><td>Longitudinal stiffness</td><td>3-point bend, 20 mm/min</td><td class="num">42 N·m/rad</td></tr>
-              <tr><td>Midsole density</td><td>Supercritical PEBA</td><td class="num">0.11 g/cm³</td></tr>
-              <tr><td>Outsole coverage</td><td>Planar projection</td><td class="num">38 %</td></tr>
-              <tr><td>Race-pace life</td><td>Return &gt; 78% threshold</td><td class="num">260 km</td></tr>
-              <tr><td>Upper mass</td><td>Knit + collar + laces</td><td class="num">41 g</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="note">Single-sample lab results from the Cinder 02 pre-production run, not a production tolerance band. Stiffness measured at 25 °C on an unworn shoe.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Measurement</th><th>Method</th><th style="text-align:right">Value</th></tr></thead>
+          <tbody>
+            <tr><td>Mass, US M9</td><td>Single shoe, laced</td><td class="num">198 g</td></tr>
+            <tr><td>Energy return</td><td>30 Hz cyclic compression</td><td class="num">84.2 %</td></tr>
+            <tr><td>Longitudinal stiffness</td><td>3-point bend, 20 mm/min</td><td class="num">42 N·m/rad</td></tr>
+            <tr><td>Midsole density</td><td>Supercritical PEBA</td><td class="num">0.11 g/cm³</td></tr>
+            <tr><td>Outsole coverage</td><td>Planar projection</td><td class="num">38 %</td></tr>
+            <tr><td>Race-pace life</td><td>Return &gt; 78% threshold</td><td class="num">260 km</td></tr>
+            <tr><td>Upper mass</td><td>Knit + collar + laces</td><td class="num">41 g</td></tr>
+          </tbody></table></div>
+        <p class="note">Single-sample lab results from the Cinder 02 pre-production run, not a production tolerance band.</p>
       </div>
     </div>
   </section>
@@ -383,7 +344,7 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
         <div class="eyebrow"><span>05 — Reserve</span><span class="rule"></span></div>
         <h2 style="font-size:clamp(30px,4.6vw,58px)">Pairs go out in order of entry</h2>
         <div class="price"><span class="big">265</span><span class="cur">USD · pair</span></div>
-        <p class="lede">First allocation ships 14 March, ahead of the spring block. Half sizes run true; the knit gives about 2 mm across the ball of the foot after 30 km.</p>
+        <p class="lede">First allocation ships 14 March. Half sizes run true; the knit gives about 2 mm across the ball of the foot after 30 km.</p>
         <div class="sizes" id="sizes" role="group" aria-label="Choose a size, US men's"></div>
         <div class="cta-row">
           <button class="btn" id="reserve" type="button">Reserve — size <span id="pickedSize">9</span></button>
@@ -397,73 +358,67 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
 
 <footer>
   <span class="mono">CINDER RACE LAB · 02 · DROP 004</span>
-  <span>Geometry generated in the browser — no model files, no textures.</span>
-  <span class="mono">WebGL · procedural</span>
+  <span>Scroll-driven product page. No WebGL, no 3D library.</span>
+  <span class="mono">~80 KB + one image</span>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function () {
   "use strict";
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* =====================================================================
-     Colourways, cards, sizes — all work with or without WebGL
-  ===================================================================== */
-  const COLORWAYS = [
-    { id: "ember", name: "Ember Drop", code: "CND2-411", price: "$265",
-      knit: 0x141922, overlay: 0x0B0F15, midsole: 0x1C222B, mid2: 0x141A22,
-      plate: 0x07090C, outsole: 0x0A0D11, collar: 0x101620, tongue: 0x0C1118,
-      stripe: 0xFF6A1B, lace: 0x2B323C, sw: ["#141922", "#1C222B", "#FF6A1B"],
-      note: "Ember Drop · lot CND2-411. Blacked-out knit with the blade picked out in ember — the only part of the shoe that catches light on a night road." },
-    { id: "ion", name: "Ion Wash", code: "CND2-118", price: "$265",
-      knit: 0x111A26, overlay: 0x0A121C, midsole: 0xE6ECF2, mid2: 0xCFD8E2,
-      plate: 0x07090C, outsole: 0x0B0F14, collar: 0x0E151F, tongue: 0x0A1017,
-      stripe: 0x3BA9FF, lace: 0xC6D3E0, sw: ["#111A26", "#E6ECF2", "#3BA9FF"],
-      note: "Ion Wash · lot CND2-118. Undyed supercritical foam left white, so you can read the compression set across a race block by eye." },
-    { id: "bone", name: "Bone Signal", code: "CND2-000", price: "$275",
-      knit: 0xDAD4C6, overlay: 0xBFB8A8, midsole: 0x1E232B, mid2: 0x161B22,
-      plate: 0x07090C, outsole: 0x0A0D11, collar: 0xCDC6B6, tongue: 0xBAB2A1,
-      stripe: 0xFF6A1B, lace: 0x232830, sw: ["#DAD4C6", "#1E232B", "#FF6A1B"],
-      note: "Bone Signal · lot CND2-000. The lab's own tester build, and the only one that has already run its full 260 km." }
+  /* ================= colourways =================
+     Each entry points at its own shot. Drop more files into assets/ and change
+     the `img` values — nothing else needs to move. */
+  const WAYS = [
+    { id:"ember", nm:"Ember Black", code:"CND2-411",
+      img:"assets/shoe.webp", sm:"assets/shoe-sm.webp", sw:["#E9E7E4","#1A1F26"],
+      note:"Ember Black · lot CND2-411. Bone knit over a white supercritical midsole, with the rail picked out in signal blue." },
+    { id:"ion", nm:"Ion Wash", code:"CND2-118",
+      img:"assets/shoe.webp", sm:"assets/shoe-sm.webp", sw:["#C7D4E2","#E8EDF2"],
+      note:"Ion Wash · lot CND2-118. Awaiting its own photography — this card currently shows the Ember shot." },
+    { id:"bone", nm:"Bone Signal", code:"CND2-000",
+      img:"assets/shoe.webp", sm:"assets/shoe-sm.webp", sw:["#DAD4C6","#1E232B"],
+      note:"Bone Signal · lot CND2-000. Awaiting its own photography — this card currently shows the Ember shot." }
   ];
-
-  const SHOE_SVG = '<svg viewBox="0 0 220 104" aria-hidden="true">' +
-    '<path d="M3.1 70.1 L 5.8 70.3 L 8.4 70.3 L 11.1 70.1 L 13.8 69.4 L 16.5 68.9 L 19.1 68.8 L 21.8 69.1 L 24.5 69.3 L 27.2 69.4 L 29.8 69.3 L 32.5 69.3 L 35.2 69.3 L 37.8 69.3 L 40.5 69.3 L 43.2 69.3 L 45.9 69.4 L 48.5 69.5 L 51.2 69.6 L 53.9 69.8 L 56.5 69.9 L 59.2 70.1 L 61.9 70.3 L 64.6 70.5 L 67.2 70.7 L 69.9 70.9 L 72.6 71.0 L 75.3 71.2 L 77.9 71.3 L 80.6 71.5 L 83.3 71.6 L 85.9 71.7 L 88.6 71.9 L 91.3 72.0 L 94.0 72.2 L 96.6 72.3 L 99.3 72.4 L 102.0 72.6 L 104.7 72.7 L 107.3 72.9 L 110.0 73.0 L 112.7 73.2 L 115.3 73.3 L 118.0 73.5 L 120.7 73.7 L 123.4 73.8 L 126.0 74.0 L 128.7 74.2 L 131.4 74.4 L 134.1 74.6 L 136.7 74.8 L 139.4 74.9 L 142.1 75.1 L 144.7 75.3 L 147.4 75.4 L 150.1 75.6 L 152.8 75.7 L 155.4 75.8 L 158.1 76.0 L 160.8 76.1 L 163.5 76.2 L 166.1 76.4 L 168.8 76.5 L 171.5 76.5 L 174.1 76.5 L 176.8 76.5 L 179.5 76.4 L 182.2 76.4 L 184.8 76.3 L 187.5 76.3 L 190.2 76.2 L 192.8 76.1 L 195.5 75.9 L 198.2 75.7 L 200.9 75.5 L 203.5 75.3 L 206.2 75.1 L 208.9 74.9 L 211.6 74.9 L 214.2 75.1 L 216.9 75.5 L 216.9 89.3 L 214.2 90.1 L 211.6 90.9 L 208.9 91.7 L 206.2 92.5 L 203.5 93.3 L 200.9 94.1 L 198.2 94.9 L 195.5 95.6 L 192.8 96.3 L 190.2 96.9 L 187.5 97.5 L 184.8 98.0 L 182.2 98.5 L 179.5 98.9 L 176.8 99.4 L 174.1 99.7 L 171.5 100.1 L 168.8 100.4 L 166.1 100.6 L 163.5 100.7 L 160.8 100.9 L 158.1 101.0 L 155.4 101.2 L 152.8 101.3 L 150.1 101.4 L 147.4 101.5 L 144.7 101.6 L 142.1 101.6 L 139.4 101.7 L 136.7 101.7 L 134.1 101.7 L 131.4 101.7 L 128.7 101.7 L 126.0 101.7 L 123.4 101.7 L 120.7 101.7 L 118.0 101.7 L 115.3 101.7 L 112.7 101.7 L 110.0 101.7 L 107.3 101.7 L 104.7 101.7 L 102.0 101.7 L 99.3 101.7 L 96.6 101.7 L 94.0 101.7 L 91.3 101.7 L 88.6 101.7 L 85.9 101.7 L 83.3 101.7 L 80.6 101.7 L 77.9 101.7 L 75.3 101.7 L 72.6 101.7 L 69.9 101.7 L 67.2 101.7 L 64.6 101.7 L 61.9 101.7 L 59.2 101.7 L 56.5 101.7 L 53.9 101.7 L 51.2 101.7 L 48.5 101.7 L 45.9 101.7 L 43.2 101.7 L 40.5 101.7 L 37.8 101.7 L 35.2 101.7 L 32.5 101.7 L 29.8 101.7 L 27.2 101.7 L 24.5 101.5 L 21.8 101.3 L 19.1 100.9 L 16.5 100.4 L 13.8 99.8 L 11.1 99.1 L 8.4 97.9 L 5.8 96.3 L 3.1 94.9 Z" fill="SOLE"/>' +
-    '<path d="M3.1 31.0 L 5.8 27.7 L 8.4 24.6 L 11.1 22.1 L 13.8 19.5 L 16.5 17.8 L 19.1 17.6 L 21.8 18.6 L 24.5 19.8 L 27.2 21.1 L 29.8 22.9 L 32.5 25.0 L 35.2 27.0 L 37.8 29.1 L 40.5 30.9 L 43.2 32.4 L 45.9 33.6 L 48.5 34.7 L 51.2 35.6 L 53.9 36.3 L 56.5 36.9 L 59.2 37.4 L 61.9 37.9 L 64.6 38.4 L 67.2 38.9 L 69.9 39.3 L 72.6 39.6 L 75.3 39.7 L 77.9 39.7 L 80.6 39.6 L 83.3 39.5 L 85.9 39.4 L 88.6 39.3 L 91.3 39.1 L 94.0 38.9 L 96.6 38.6 L 99.3 38.4 L 102.0 38.2 L 104.7 38.1 L 107.3 37.9 L 110.0 37.7 L 112.7 37.7 L 115.3 37.9 L 118.0 38.2 L 120.7 38.7 L 123.4 39.4 L 126.0 40.0 L 128.7 40.9 L 131.4 42.0 L 134.1 43.2 L 136.7 44.5 L 139.4 46.1 L 142.1 47.7 L 144.7 49.3 L 147.4 50.7 L 150.1 52.0 L 152.8 53.2 L 155.4 54.4 L 158.1 55.5 L 160.8 56.6 L 163.5 57.6 L 166.1 58.6 L 168.8 59.5 L 171.5 60.3 L 174.1 61.0 L 176.8 61.6 L 179.5 62.1 L 182.2 62.7 L 184.8 63.3 L 187.5 63.9 L 190.2 64.5 L 192.8 65.0 L 195.5 65.5 L 198.2 66.1 L 200.9 66.7 L 203.5 67.3 L 206.2 68.1 L 208.9 68.9 L 211.6 70.0 L 214.2 71.4 L 216.9 73.0 L 216.9 75.5 L 214.2 75.1 L 211.6 74.9 L 208.9 74.9 L 206.2 75.1 L 203.5 75.3 L 200.9 75.5 L 198.2 75.7 L 195.5 75.9 L 192.8 76.1 L 190.2 76.2 L 187.5 76.3 L 184.8 76.3 L 182.2 76.4 L 179.5 76.4 L 176.8 76.5 L 174.1 76.5 L 171.5 76.5 L 168.8 76.5 L 166.1 76.4 L 163.5 76.2 L 160.8 76.1 L 158.1 76.0 L 155.4 75.8 L 152.8 75.7 L 150.1 75.6 L 147.4 75.4 L 144.7 75.3 L 142.1 75.1 L 139.4 74.9 L 136.7 74.8 L 134.1 74.6 L 131.4 74.4 L 128.7 74.2 L 126.0 74.0 L 123.4 73.8 L 120.7 73.7 L 118.0 73.5 L 115.3 73.3 L 112.7 73.2 L 110.0 73.0 L 107.3 72.9 L 104.7 72.7 L 102.0 72.6 L 99.3 72.4 L 96.6 72.3 L 94.0 72.2 L 91.3 72.0 L 88.6 71.9 L 85.9 71.7 L 83.3 71.6 L 80.6 71.5 L 77.9 71.3 L 75.3 71.2 L 72.6 71.0 L 69.9 70.9 L 67.2 70.7 L 64.6 70.5 L 61.9 70.3 L 59.2 70.1 L 56.5 69.9 L 53.9 69.8 L 51.2 69.6 L 48.5 69.5 L 45.9 69.4 L 43.2 69.3 L 40.5 69.3 L 37.8 69.3 L 35.2 69.3 L 32.5 69.3 L 29.8 69.3 L 27.2 69.4 L 24.5 69.3 L 21.8 69.1 L 19.1 68.8 L 16.5 68.9 L 13.8 69.4 L 11.1 70.1 L 8.4 70.3 L 5.8 70.3 L 3.1 70.1 Z" fill="KNIT"/>' +
-    '<path d="M6.2 83.9 L 9.7 85.1 L 13.1 85.5 L 16.6 85.7 L 20.0 86.1 L 23.5 86.5 L 27.0 86.7 L 30.4 86.7 L 33.9 86.7 L 37.3 86.7 L 40.8 86.7 L 44.3 86.7 L 47.7 86.8 L 51.2 86.8 L 54.6 86.9 L 58.1 87.0 L 61.6 87.1 L 65.0 87.1 L 68.5 87.2 L 71.9 87.3 L 75.4 87.4 L 78.9 87.5 L 82.3 87.5 L 85.8 87.6 L 89.2 87.7 L 92.7 87.7 L 96.2 87.8 L 99.6 87.9 L 103.1 88.0 L 106.5 88.0 L 110.0 88.1 L 113.5 88.2 L 116.9 88.3 L 120.4 88.3 L 123.8 88.4 L 127.3 88.5 L 130.8 88.6 L 134.2 88.7 L 137.7 88.8 L 141.1 88.9 L 144.6 88.9 L 148.1 88.9 L 151.5 88.9 L 155.0 88.9 L 158.4 88.8 L 161.9 88.8 L 165.4 88.7 L 168.8 88.6 L 172.3 88.4 L 175.7 88.1 L 179.2 87.7 L 182.7 87.3 L 186.1 86.9 L 189.6 86.5 L 193.0 85.9 L 196.5 85.3 L 200.0 84.5 L 203.4 83.8 L 206.9 83.1 L 210.3 82.4 L 213.8 81.8 L 213.8 80.1 L 210.3 80.7 L 206.9 81.4 L 203.4 82.2 L 200.0 82.9 L 196.5 83.6 L 193.0 84.3 L 189.6 84.8 L 186.1 85.3 L 182.7 85.7 L 179.2 86.1 L 175.7 86.5 L 172.3 86.8 L 168.8 87.0 L 165.4 87.1 L 161.9 87.1 L 158.4 87.2 L 155.0 87.2 L 151.5 87.3 L 148.1 87.3 L 144.6 87.3 L 141.1 87.2 L 137.7 87.2 L 134.2 87.1 L 130.8 87.0 L 127.3 86.9 L 123.8 86.8 L 120.4 86.7 L 116.9 86.6 L 113.5 86.5 L 110.0 86.5 L 106.5 86.4 L 103.1 86.3 L 99.6 86.3 L 96.2 86.2 L 92.7 86.1 L 89.2 86.1 L 85.8 86.0 L 82.3 85.9 L 78.9 85.8 L 75.4 85.8 L 71.9 85.7 L 68.5 85.6 L 65.0 85.5 L 61.6 85.4 L 58.1 85.3 L 54.6 85.3 L 51.2 85.2 L 47.7 85.1 L 44.3 85.1 L 40.8 85.1 L 37.3 85.1 L 33.9 85.1 L 30.4 85.1 L 27.0 85.1 L 23.5 84.9 L 20.0 84.5 L 16.6 84.1 L 13.1 83.9 L 9.7 83.5 L 6.2 82.3 Z" fill="BLADE"/></svg>';
 
   const strip = document.getElementById("strip");
   const wayNote = document.getElementById("wayNote");
-  let activeWay = 0;
+  const shoe = document.getElementById("shoe");
 
-  COLORWAYS.forEach(function (cw, i) {
+  WAYS.forEach(function (w, i) {
     const b = document.createElement("button");
-    b.type = "button"; b.className = "card"; b.id = "card-" + cw.id;
+    b.type = "button"; b.className = "card"; b.id = "way-" + w.id;
     b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
-    b.innerHTML =
-      '<span><span class="nm">' + cw.name + '</span>' +
-      '<span class="meta">' + cw.code + ' &nbsp;|&nbsp; <b>' + cw.price + '</b></span></span>' +
-      SHOE_SVG.replace("SOLE", cw.sw[1]).replace("KNIT", cw.sw[0]).replace("BLADE", cw.sw[2]);
-    b.addEventListener("click", function () { setColorway(i); });
+    b.innerHTML = '<span><span class="nm">' + w.nm + '</span>' +
+      '<span class="meta">' + w.code + '</span></span>' +
+      '<span class="sw" style="background:' + w.sw[0] + '"><i style="background:' + w.sw[1] + '"></i></span>';
+    b.addEventListener("click", function () { setWay(i); });
     strip.appendChild(b);
   });
-
-  function setColorway(i) {
-    activeWay = i;
-    Array.prototype.forEach.call(strip.children, function (el, k) {
-      el.setAttribute("aria-pressed", k === i ? "true" : "false");
-    });
-    wayNote.textContent = COLORWAYS[i].note;
-    if (window.__applyColorway) window.__applyColorway(COLORWAYS[i]);
+  function setWay(i) {
+    Array.prototype.forEach.call(strip.children, (el, k) =>
+      el.setAttribute("aria-pressed", k === i ? "true" : "false"));
+    wayNote.textContent = WAYS[i].note;
+    if (shoe.getAttribute("src") !== WAYS[i].img) {
+      shoe.style.opacity = "0";
+      setTimeout(function () {
+        shoe.src = WAYS[i].img;
+        shoe.srcset = WAYS[i].sm + " 760w, " + WAYS[i].img + " 1400w";
+        shoe.style.opacity = "1";
+      }, 180);
+    }
   }
-  wayNote.textContent = COLORWAYS[0].note;
+  shoe.style.transition = "opacity .18s";
+  wayNote.textContent = WAYS[0].note;
 
+  /* ================= sizes ================= */
   const sizeHost = document.getElementById("sizes");
   const picked = document.getElementById("pickedSize");
   const stockNote = document.getElementById("stockNote");
   let pickedSize = "9";
-  [["7", 4], ["7.5", 6], ["8", 0], ["8.5", 5], ["9", 42], ["9.5", 18],
-   ["10", 11], ["10.5", 0], ["11", 7], ["11.5", 3], ["12", 9], ["13", 2]].forEach(function (s) {
+  [["7",4],["7.5",6],["8",0],["8.5",5],["9",42],["9.5",18],
+   ["10",11],["10.5",0],["11",7],["11.5",3],["12",9],["13",2]].forEach(function (s) {
     const b = document.createElement("button");
     b.type = "button"; b.className = "size"; b.id = "size-" + s[0].replace(".", "-");
     b.textContent = s[0];
@@ -471,7 +426,7 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
     b.setAttribute("aria-pressed", s[0] === "9" ? "true" : "false");
     b.addEventListener("click", function () {
       pickedSize = s[0];
-      Array.prototype.forEach.call(sizeHost.children, function (el) { el.setAttribute("aria-pressed", "false"); });
+      Array.prototype.forEach.call(sizeHost.children, el => el.setAttribute("aria-pressed", "false"));
       b.setAttribute("aria-pressed", "true");
       picked.textContent = s[0];
       stockNote.textContent = s[1] + " pairs left in this allocation";
@@ -482,13 +437,10 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
     stockNote.textContent = "Demo page — size " + pickedSize + " not actually reserved";
   });
 
-  /* =====================================================================
-     Scroll model
-  ===================================================================== */
+  /* ================= scroll model ================= */
   const sections = Array.prototype.slice.call(document.querySelectorAll(".chapter"));
   const railLinks = Array.prototype.slice.call(document.querySelectorAll(".rail a"));
   let stageIndex = 0;
-
   function measure() {
     const focus = window.scrollY + window.innerHeight * 0.5;
     const mids = sections.map(function (s) {
@@ -503,839 +455,137 @@ footer{position:relative;z-index:10;border-top:1px solid var(--edge);background:
     }
     stageIndex = idx;
     const near = Math.round(idx);
-    railLinks.forEach(function (a) {
-      a.setAttribute("aria-current", Math.abs(+a.dataset.rail - near) < 1 ? "true" : "false");
-    });
+    railLinks.forEach(a => a.setAttribute("aria-current",
+      Math.abs(+a.dataset.rail - near) < 1 ? "true" : "false"));
   }
   measure();
   window.addEventListener("scroll", measure, { passive: true });
   window.addEventListener("resize", measure);
 
-  /* =====================================================================
-     WebGL stage
-  ===================================================================== */
-  const canvas = document.getElementById("gl");
-  const THREE = window.THREE;
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!THREE) { document.body.classList.add("nogl"); return; }
-
-  let renderer;
-  try {
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-  } catch (e) { renderer = null; }
-  if (!renderer) { document.body.classList.add("nogl"); return; }
-
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setClearColor(0x000000, 0);
-  renderer.outputEncoding = THREE.sRGBEncoding;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.90;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x05070B, 9, 26);
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-  camera.position.set(0, 0.30, 6);
-
-  /* ---- dark studio environment: one warm band, one cool ---- */
-  (function () {
-    const c = document.createElement("canvas");
-    c.width = 512; c.height = 256;
-    const g = c.getContext("2d");
-    const grad = g.createLinearGradient(0, 0, 0, 256);
-    grad.addColorStop(0.00, "#0d141d");
-    grad.addColorStop(0.48, "#10171f");
-    grad.addColorStop(0.54, "#070a0e");
-    grad.addColorStop(1.00, "#04060a");
-    g.fillStyle = grad; g.fillRect(0, 0, 512, 256);
-    let r = g.createRadialGradient(140, 150, 4, 140, 150, 120);
-    r.addColorStop(0, "rgba(255,132,48,.55)");
-    r.addColorStop(1, "rgba(255,106,27,0)");
-    g.fillStyle = r; g.fillRect(0, 40, 300, 216);
-    r = g.createRadialGradient(392, 88, 4, 392, 88, 104);
-    r.addColorStop(0, "rgba(120,190,255,.50)");
-    r.addColorStop(1, "rgba(59,169,255,0)");
-    g.fillStyle = r; g.fillRect(270, 0, 242, 200);
-    r = g.createRadialGradient(250, 26, 4, 250, 26, 70);
-    r.addColorStop(0, "rgba(255,255,255,.40)");
-    r.addColorStop(1, "rgba(255,255,255,0)");
-    g.fillStyle = r; g.fillRect(160, 0, 190, 110);
-    const tex = new THREE.CanvasTexture(c);
-    tex.mapping = THREE.EquirectangularReflectionMapping;
-    tex.encoding = THREE.sRGBEncoding;
-    const pm = new THREE.PMREMGenerator(renderer);
-    pm.compileEquirectangularShader();
-    scene.environment = pm.fromEquirectangular(tex).texture;
-    tex.dispose(); pm.dispose();
-  })();
-
-  /* ---- lights: warm key low-right, cool rim back-left ---- */
-  scene.add(new THREE.HemisphereLight(0x2a3646, 0x05070b, 0.20));
-  const key = new THREE.DirectionalLight(0xffa060, 1.5);
-  key.position.set(3.0, 2.0, 2.6);
-  key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
-  key.shadow.camera.left = -2.6; key.shadow.camera.right = 2.6;
-  key.shadow.camera.top = 2.6; key.shadow.camera.bottom = -2.6;
-  key.shadow.camera.near = 0.5; key.shadow.camera.far = 14;
-  key.shadow.bias = -0.0013; key.shadow.radius = 3;
-  scene.add(key);
-  const rim = new THREE.DirectionalLight(0x6fb8ff, 1.1);
-  rim.position.set(-3.4, 1.6, -2.4);
-  scene.add(rim);
-  const under = new THREE.PointLight(0xff6a1b, 1.1, 4.5, 2);
-  under.position.set(0.4, -0.62, 0.9);
-  scene.add(under);
-  const fillL = new THREE.DirectionalLight(0xbfd6ff, 0.22);
-  fillL.position.set(-1.2, 2.6, 3.2);
-  scene.add(fillL);
-
-  // depthWrite off: a shadow catcher must not occlude the backdrop behind it
-  const shadowMat = new THREE.ShadowMaterial({ opacity: 0.5, depthWrite: false });
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), shadowMat);
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -0.66;
-  floor.receiveShadow = true;
-  scene.add(floor);
-
-  /* ---- atmosphere: grid, glow, sparks, shards, swirls ---- */
-  const atmos = new THREE.Group();
-  scene.add(atmos);
-
-  const grid = new THREE.GridHelper(34, 44, 0x2a4a66, 0x16283a);
-  grid.material.transparent = true;
-  grid.material.opacity = 0.5;
-  grid.material.depthWrite = false;
-  grid.position.y = -0.665;
-  atmos.add(grid);
-
-  function radialTexture(inner, outer) {
-    const c = document.createElement("canvas");
-    c.width = c.height = 128;
-    const g = c.getContext("2d");
-    const r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-    r.addColorStop(0, inner); r.addColorStop(1, outer);
-    g.fillStyle = r; g.fillRect(0, 0, 128, 128);
-    return new THREE.CanvasTexture(c);
-  }
-  const glowTex = radialTexture("rgba(255,150,70,.95)", "rgba(255,106,27,0)");
-  const sparkTex = radialTexture("rgba(255,220,180,1)", "rgba(255,140,60,0)");
-
-  // standing in for a bloom pass, which the UMD build has no compositor for
-  const glows = [];
-  [[0.0, -0.10, -1.7, 4.2, 0.30], [0.9, -0.45, -1.1, 2.4, 0.24], [-1.1, 0.15, -1.3, 2.0, 0.18]]
-    .forEach(function (g) {
-      const s = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: true,
-        transparent: true, opacity: g[4]
-      }));
-      s.position.set(g[0], g[1], g[2]);
-      s.scale.setScalar(g[3]);
-      s.renderOrder = -1;
-      atmos.add(s); glows.push(s);
-    });
-
-  const sparkCount = 420;
-  const sparkPos = new Float32Array(sparkCount * 3);
-  const sparkSeed = new Float32Array(sparkCount * 3);
-  for (let i = 0; i < sparkCount; i++) {
-    const a = Math.random() * Math.PI * 2, rr = 1.1 + Math.random() * 2.6;
-    sparkPos[i * 3] = Math.cos(a) * rr;
-    sparkPos[i * 3 + 1] = -0.6 + Math.random() * 2.2;
-    sparkPos[i * 3 + 2] = Math.sin(a) * rr * 0.7;
-    sparkSeed[i * 3] = Math.random() * 6.28;
-    sparkSeed[i * 3 + 1] = 0.1 + Math.random() * 0.5;
-    sparkSeed[i * 3 + 2] = Math.random() * 6.28;
-  }
-  const sparkGeo = new THREE.BufferGeometry();
-  sparkGeo.setAttribute("position", new THREE.BufferAttribute(sparkPos, 3));
-  const sparks = new THREE.Points(sparkGeo, new THREE.PointsMaterial({
-    map: sparkTex, size: 0.055, sizeAttenuation: true, transparent: true,
-    blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.85, color: 0xffb070
-  }));
-  atmos.add(sparks);
-
-  // Dotted skyline backdrop. Columns of lit squares with randomised heights and
-  // gaps, so it reads as distant windows rather than a regular lattice.
-  let city = null, cityBase = null;
-  (function () {
-    const COLS = 108, ROWS = 38, spanX = 36, spanY = 10.5;
-    const heights = [];
-    for (let c = 0; c < COLS; c++) heights.push(0.10 + Math.pow(Math.random(), 1.85) * 0.94);
-    const pos = [], col = [];
-    for (let c = 0; c < COLS; c++) {
-      for (let r = 0; r < ROWS; r++) {
-        const fy = r / (ROWS - 1);
-        if (fy > heights[c] || Math.random() < 0.26) continue;
-        const z = -7.6 - Math.random() * 2.8;
-        pos.push(-spanX / 2 + spanX * (c / (COLS - 1)), -2.9 + spanY * fy, z);
-        const depth = 1 - ((-z) - 7.6) / 2.8 * 0.5;         // farther columns dimmer
-        const b = (0.20 + Math.random() * 0.80) * depth;
-        if (Math.random() < 0.09) col.push(1.00 * b, 0.50 * b, 0.19 * b);  // a few warm
-        else col.push(0.15 * b, 0.55 * b, 0.98 * b);
-      }
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-    g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
-    city = new THREE.Points(g, new THREE.PointsMaterial({
-      size: 0.105, sizeAttenuation: true, vertexColors: true, transparent: true,
-      blending: THREE.AdditiveBlending, depthWrite: false, fog: false, opacity: 0.92
-    }));
-    cityBase = 0.92;
-    atmos.add(city);
-  })();
-
-  // horizontal light streaks raking across the backdrop
-  const streaks = [];
-  (function () {
-    const c = document.createElement("canvas");
-    c.width = 256; c.height = 32;
-    const g = c.getContext("2d");
-    const hg = g.createLinearGradient(0, 0, 256, 0);
-    hg.addColorStop(0.00, "rgba(255,255,255,0)");
-    hg.addColorStop(0.40, "rgba(210,235,255,.75)");
-    hg.addColorStop(0.62, "rgba(255,255,255,1)");
-    hg.addColorStop(1.00, "rgba(255,255,255,0)");
-    g.fillStyle = hg; g.fillRect(0, 0, 256, 32);
-    const vg = g.createLinearGradient(0, 0, 0, 32);
-    vg.addColorStop(0.0, "rgba(0,0,0,0)");
-    vg.addColorStop(0.5, "rgba(0,0,0,1)");
-    vg.addColorStop(1.0, "rgba(0,0,0,0)");
-    g.globalCompositeOperation = "destination-in";
-    g.fillStyle = vg; g.fillRect(0, 0, 256, 32);
-    const tex = new THREE.CanvasTexture(c);
-    [[-3.4, 1.6, -5.2, 6.2, 0x8fcaff, 0.50, 0.10],
-     [3.2, -0.8, -4.4, 4.6, 0xff8a3d, 0.44, -0.07],
-     [0.4, 2.3, -6.4, 7.4, 0xa8d8ff, 0.30, 0.05],
-     [-1.8, -1.6, -5.8, 5.0, 0x6fb8ff, 0.26, -0.04]].forEach(function (s) {
-      const m = new THREE.Mesh(
-        new THREE.PlaneGeometry(s[3], s[3] * 0.085),
-        new THREE.MeshBasicMaterial({
-          map: tex, color: s[4], transparent: true, blending: THREE.AdditiveBlending,
-          depthWrite: false, fog: false, opacity: s[5]
-        })
-      );
-      m.position.set(s[0], s[1], s[2]);
-      m.rotation.z = s[6];
-      m.userData.base = s[5];
-      m.userData.drift = s[0];
-      atmos.add(m); streaks.push(m);
-    });
-  })();
-
-  // a few large, near-black facets far behind the grid, for silhouette depth
-  const shards = [];
-  [[-6.4, -0.6, -13.5, 4.2, 0x1a2a3a, 4], [6.0, -0.2, -14.5, 5.0, 0x24303c, 5],
-   [0.8, 0.4, -16.0, 3.4, 0x2a2420, 3]].forEach(function (s) {
-    const m = new THREE.Mesh(
-      new THREE.ConeGeometry(s[3] * 0.72, s[3] * 1.5, s[5], 1),
-      new THREE.MeshStandardMaterial({
-        color: s[4], roughness: 0.7, metalness: 0.1, flatShading: true,
-        emissive: s[4], emissiveIntensity: 0.05, fog: false
-      })
-    );
-    m.position.set(s[0], s[1], s[2]);
-    m.rotation.y = Math.random() * 3.14;
-    atmos.add(m); shards.push(m);
-  });
-
-  // energy swirls orbiting the shoe
-  const swirls = [];
-  [[1.46, 0.30, 0xff6a1b, 0.010, 0.30], [1.74, -0.22, 0xffb23d, 0.007, 0.22],
-   [1.30, 0.05, 0x3BA9FF, 0.006, 0.16]].forEach(function (s) {
-    const pts = [];
-    for (let i = 0; i <= 150; i++) {
-      const t = i / 150, a = t * Math.PI * 2;
-      pts.push(new THREE.Vector3(
-        Math.cos(a) * s[0] * 1.25,
-        s[1] + Math.sin(a * 2 + 0.6) * 0.34,
-        Math.sin(a) * s[0] * 0.80
-      ));
-    }
-    const tube = new THREE.Mesh(
-      new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true, "catmullrom", 0.5), 190, s[3], 7, true),
-      new THREE.MeshBasicMaterial({
-        color: s[2], transparent: true, opacity: s[4],
-        blending: THREE.AdditiveBlending, depthWrite: false
-      })
-    );
-    atmos.add(tube); swirls.push(tube);
-  });
-
-  /* =====================================================================
-     Shoe geometry — the verified build, unchanged
-  ===================================================================== */
-  function curveFn(pts) {
-    const n = pts.length;
-    const xs = pts.map(function (p) { return p[0]; });
-    const ys = pts.map(function (p) { return p[1]; });
-    const h = [], del = [];
-    for (let i = 0; i < n - 1; i++) { h[i] = xs[i + 1] - xs[i]; del[i] = (ys[i + 1] - ys[i]) / h[i]; }
-    const d = new Array(n);
-    d[0] = del[0]; d[n - 1] = del[n - 2];
-    for (let i = 1; i < n - 1; i++) {
-      if (del[i - 1] * del[i] <= 0) { d[i] = 0; }
-      else {
-        const w1 = 2 * h[i] + h[i - 1], w2 = h[i] + 2 * h[i - 1];
-        d[i] = (w1 + w2) / (w1 / del[i - 1] + w2 / del[i]);
-      }
-    }
-    return function (x) {
-      if (x <= xs[0]) return ys[0];
-      if (x >= xs[n - 1]) return ys[n - 1];
-      let i = 0; while (i < n - 2 && x > xs[i + 1]) i++;
-      const t = (x - xs[i]) / h[i], t2 = t * t, t3 = t2 * t;
-      return (2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h[i] * d[i] +
-             (-2 * t3 + 3 * t2) * ys[i + 1] + (t3 - t2) * h[i] * d[i + 1];
-    };
-  }
-
-  // half-widths of the last, lateral (+z) and medial (−z)
-  const zLat = curveFn([
-    [-1.380, 0.015], [-1.368, 0.108], [-1.336, 0.216], [-1.270, 0.278], [-1.100, 0.302],
-    [-0.860, 0.322], [-0.600, 0.320], [-0.340, 0.308], [-0.080, 0.320], [0.160, 0.360],
-    [0.420, 0.410], [0.640, 0.430], [0.860, 0.424], [1.060, 0.400], [1.200, 0.364],
-    [1.290, 0.304], [1.345, 0.214], [1.372, 0.112], [1.380, 0.018]
-  ]);
-  const zMed = curveFn([
-    [-1.380, 0.015], [-1.368, 0.104], [-1.336, 0.208], [-1.270, 0.268], [-1.100, 0.290],
-    [-0.860, 0.308], [-0.600, 0.288], [-0.340, 0.256], [-0.080, 0.258], [0.160, 0.304],
-    [0.420, 0.360], [0.640, 0.390], [0.860, 0.392], [1.060, 0.374], [1.200, 0.342], [1.290, 0.286], [1.345, 0.204], [1.372, 0.108], [1.380, 0.018]
-  ]);
-
-  // rocker: bottom of the outsole rim
-  const soleBottom = curveFn([
-    [-1.38, 0.088], [-1.26, 0.028], [-1.06, 0.000], [0.35, 0.000],
-    [0.72, 0.014], [1.02, 0.058], [1.22, 0.112], [1.38, 0.160]
-  ]);
-  // total stack above the rim
-  const stack = curveFn([
-    [-1.38, 0.300], [-1.16, 0.395], [-0.92, 0.398], [-0.42, 0.372], [0.10, 0.344],
-    [0.50, 0.315], [0.90, 0.270], [1.18, 0.218], [1.32, 0.184], [1.38, 0.158]
-  ]);
-  function midTop(x) { return soleBottom(x) + stack(x); }
-  // height of the upper's top edge above the footbed; inside the collar range
-  // this doubles as the height of the collar rim itself
-  // Height of the upper's top edge above the footbed. Behind the throat this is
-  // the collar rim; ahead of it, the centreline ridge over the toe box.
-  // Tuned so the absolute top line matches a real 270 mm shoe measured off the
-  // ground: 107 mm at the collar, a notch at 78, flat through the lace panel at
-  // 80 → 72, then the toe box falling away to 51.
-  const topH = curveFn([
-    [-1.380, 0.505], [-1.300, 0.600], [-1.190, 0.662], [-1.080, 0.628],
-    [-0.980, 0.556], [-0.880, 0.486], [-0.760, 0.440], [-0.620, 0.418],
-    [-0.480, 0.406], [-0.300, 0.418], [-0.100, 0.444], [0.055, 0.458],
-    [0.200, 0.440], [0.330, 0.397], [0.460, 0.330], [0.600, 0.272],
-    [0.770, 0.216], [0.950, 0.172], [1.120, 0.130], [1.260, 0.084], [1.380, 0.032]
-  ]);
-
-  // The opening is a keyhole, not an ellipse: the ankle collar plus a slot
-  // running forward to the vamp point, which the laces span and the tongue fills.
-  const THROAT_X0 = -1.075, THROAT_X1 = 0.470;
-  const throatW = curveFn([
-    [-1.075, 0.015], [-1.040, 0.098], [-0.950, 0.170], [-0.800, 0.206],
-    [-0.620, 0.216], [-0.430, 0.206], [-0.250, 0.180], [-0.060, 0.150],
-    [0.120, 0.120], [0.280, 0.090], [0.400, 0.052], [0.470, 0.015]
-  ]);
-  function collarHalfW(x) {
-    if (x <= THROAT_X0 || x >= THROAT_X1) return 0;
-    return Math.max(0, throatW(x));
-  }
-
-  const M = 60;
-  const XS = [];
-  for (let k = 0; k <= M; k++) {
-    const u = k / M;
-    XS.push(-1.38 + 2.76 * (0.5 - 0.5 * Math.cos(Math.PI * u)));
-  }
-  // closed outline, symmetric stations: index k<=M is lateral, index i>M is medial station 2M-i
-  const OUT = [];
-  for (let k = 0; k <= M; k++) OUT.push({ x: XS[k], z: zLat(XS[k]) });
-  for (let k = M - 1; k >= 1; k--) OUT.push({ x: XS[k], z: -zMed(XS[k]) });
-  const N = OUT.length; // 2M
-
-  function buildFromRings(rings) {
-    const R = rings.length, P = rings[0].length;
-    const pos = new Float32Array(R * P * 3);
-    const uv = new Float32Array(R * P * 2);
-    const idx = [];
-    let o = 0, o2 = 0;
-    for (let r = 0; r < R; r++) {
-      for (let i = 0; i < P; i++) {
-        const p = rings[r][i];
-        pos[o++] = p.x; pos[o++] = p.y; pos[o++] = p.z;
-        uv[o2++] = i / P; uv[o2++] = r / (R - 1);
-      }
-    }
-    for (let r = 0; r < R - 1; r++) {
-      for (let i = 0; i < P; i++) {
-        const i2 = (i + 1) % P;
-        const a = r * P + i, b = r * P + i2, c = (r + 1) * P + i2, d = (r + 1) * P + i;
-        idx.push(a, b, c, a, c, d);
-      }
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-    g.setIndex(idx);
-    g.computeVertexNormals();
-    return g;
-  }
-
-  // a band of rings sweeping between two y functions
-  function band(yA, yB, steps) {
-    return steps.map(function (st) {
-      const t = st[0], s = st[1];
-      return OUT.map(function (p) {
-        const a = yA(p.x), b = yB(p.x);
-        return new THREE.Vector3(p.x * (1 - (1 - s) * 0.30), a + (b - a) * t, p.z * s);
-      });
-    });
-  }
-  // a cap: concentric rings shrinking to a point at the centre
-  function cap(yFn, steps) {
-    return steps.map(function (st) {
-      const s = st[0], off = st[1];
-      return OUT.map(function (p) {
-        const x = p.x * s;
-        return new THREE.Vector3(x, yFn(x) + off, p.z * s);
-      });
-    });
-  }
-
-  const plateLow = function (x) { return soleBottom(x) + 0.036 + 0.38 * (midTop(x) - soleBottom(x) - 0.036); };
-  const plateHigh = function (x) { return plateLow(x) + 0.021; };
-  const outsoleTop = function (x) { return soleBottom(x) + 0.040; };
-
-  /* ---- materials: dark bodywork, one emissive blade ---- */
-  function physical(o) { return new THREE.MeshPhysicalMaterial(Object.assign({ side: THREE.DoubleSide }, o)); }
-  const matKnit = physical({ color: 0x141922, roughness: 0.80, metalness: 0.03, clearcoat: 0.12, clearcoatRoughness: 0.6 });
-  const matOverlay = physical({ color: 0x0B0F15, roughness: 0.30, metalness: 0.18, clearcoat: 0.75, clearcoatRoughness: 0.22 });
-  const matMid = physical({ color: 0x1C222B, roughness: 0.52, metalness: 0.02 });
-  const matMid2 = physical({ color: 0x141A22, roughness: 0.58, metalness: 0.02 });
-  const matPlate = physical({ color: 0x07090C, roughness: 0.18, metalness: 0.45, clearcoat: 1.0, clearcoatRoughness: 0.08 });
-  const matOutsole = physical({ color: 0x0A0D11, roughness: 0.86 });
-  const matCollar = physical({ color: 0x101620, roughness: 0.92 });
-  const matTongue = physical({ color: 0x0C1118, roughness: 0.90 });
-  const matLace = physical({ color: 0x2B323C, roughness: 0.95 });
-  const matInner = physical({ color: 0x05070A, roughness: 0.99 });
-  const matStripe = physical({
-    color: 0xFF6A1B, roughness: 0.26, metalness: 0.0,
-    emissive: 0xFF6A1B, emissiveIntensity: 1.35, clearcoat: 0.8, clearcoatRoughness: 0.15
-  });
-
-  function mesh(geo, mat) {
-    const m = new THREE.Mesh(geo, mat);
-    m.castShadow = true; m.receiveShadow = true;
-    return m;
-  }
-
-  const shoe = new THREE.Group();
-  const inner = new THREE.Group();
-  inner.position.y = -0.36;
-  shoe.add(inner);
-  scene.add(shoe);
-
-  const gUpper = new THREE.Group();
-  const gMid = new THREE.Group();
-  const gPlate = new THREE.Group();
-  const gOut = new THREE.Group();
-  inner.add(gUpper, gMid, gPlate, gOut);
-
-  /* ---- outsole ---- */
-  (function () {
-    const rings = []
-      .concat(cap(soleBottom, [[0.001, -0.022], [0.34, -0.020], [0.64, -0.016], [0.87, -0.009], [1.00, 0.000]]))
-      .concat(band(soleBottom, outsoleTop, [[0.0, 1.0], [0.55, 1.002], [1.0, 0.998]]))
-      .concat(cap(outsoleTop, [[1.00, 0.000], [0.87, 0.000], [0.64, 0.000], [0.34, 0.000], [0.001, 0.000]]));
-    gOut.add(mesh(buildFromRings(rings), matOutsole));
-  })();
-
-  /* ---- rubber pods on the underside ---- */
-  (function () {
-    function pod(x0, x1, wScale, lift) {
-      const seg = 14;
-      const ringA = [], ringB = [];
-      for (let i = 0; i <= seg; i++) {
-        const t = i / seg;
-        const x = x0 + (x1 - x0) * t;
-        const taper = Math.sin(Math.PI * (0.18 + 0.64 * t));
-        const w = (zLat(x) + zMed(x)) * 0.5 * wScale * taper;
-        ringA.push(new THREE.Vector3(x, soleBottom(x) - 0.019 - lift, w));
-        ringB.push(new THREE.Vector3(x, soleBottom(x) - 0.019 - lift, -w));
-      }
-      const loop = ringA.concat(ringB.slice().reverse());
-      const top = loop.map(function (p) { return new THREE.Vector3(p.x, p.y + 0.030, p.z); });
-      const midR = loop.map(function (p) { return new THREE.Vector3(p.x * 0.995, p.y + 0.004, p.z * 0.92); });
-      const rings = [
-        loop.map(function (p) { return new THREE.Vector3(p.x * 0.97, p.y + 0.010, p.z * 0.80); }),
-        midR, loop, top
-      ];
-      return buildFromRings(rings);
-    }
-    const podMat = physical({ color: 0x0E1012, roughness: 0.88 });
-    [[0.42, 1.16, 0.86, 0.000], [0.02, 0.34, 0.74, 0.002], [-1.24, -0.78, 0.80, 0.000]].forEach(function (p) {
-      gOut.add(mesh(pod(p[0], p[1], p[2], p[3]), podMat));
-    });
-    matOutsole.userData.pod = podMat;
-  })();
-
-  /* ---- midsole: lower foam, plate, upper foam ---- */
-  (function () {
-    const lower = band(function (x) { return soleBottom(x) + 0.034; }, plateLow,
-      [[0.0, 0.998], [0.5, 1.004], [1.0, 1.000]]);
-    gMid.add(mesh(buildFromRings(lower), matMid2));
-
-    const upper = band(plateHigh, midTop, [[0.0, 1.000], [0.35, 1.004], [0.75, 0.992], [1.0, 0.962]]);
-    const upperCap = cap(midTop, [[0.962, 0.000], [0.80, -0.002], [0.52, -0.004], [0.24, -0.005], [0.001, -0.005]]);
-    gMid.add(mesh(buildFromRings(upper.concat(upperCap)), matMid));
-  })();
-
-  (function () {
-    const rings = []
-      .concat(cap(plateLow, [[0.001, 0], [0.4, 0], [0.72, 0], [0.92, 0], [1.006, 0]]))
-      .concat(band(plateLow, plateHigh, [[0.0, 1.006], [1.0, 1.006]]))
-      .concat(cap(plateHigh, [[1.006, 0], [0.92, 0], [0.72, 0], [0.4, 0], [0.001, 0]]));
-    gPlate.add(mesh(buildFromRings(rings), matPlate));
-  })();
-
-  /* ---- upper surface: analytic so decorations can sit on it ---- */
-  const UP_SCALE = 0.962;
-  // v = 0 sits on the midsole edge; v = 1 lands on the top edge, which is the
-  // centreline ridge along the toe and heel and the collar rim around the opening
-  function upperPoint(x, sign, v) {
-    const zEdge = (sign > 0 ? zLat(x) : -zMed(x)) * UP_SCALE;
-    const hw = collarHalfW(x);
-    const zTop = sign > 0 ? hw : -hw;
-    const c = Math.pow(Math.max(0, Math.cos(v * Math.PI / 2)), 0.70);
-    const s = Math.pow(Math.max(0, Math.sin(v * Math.PI / 2)), 0.92);
-    return new THREE.Vector3(x, midTop(x) + topH(x) * s, zEdge * c + zTop * (1 - c));
-  }
-  function upperNormal(x, sign, v) {
-    const e = 0.012;
-    const a = upperPoint(Math.min(1.37, x + e), sign, v).sub(upperPoint(Math.max(-1.37, x - e), sign, v));
-    const b = upperPoint(x, sign, Math.min(0.995, v + 0.02)).sub(upperPoint(x, sign, Math.max(0.0, v - 0.02)));
-    const n = new THREE.Vector3().crossVectors(a, b).normalize();
-    if (n.z * sign < 0) n.negate();
-    if (Math.abs(n.z) < 0.02 && n.y < 0) n.negate();
-    return n;
-  }
-
-  (function buildUpper() {
-    const V = 16;
-    const rings = [];
-    for (let r = 0; r < V; r++) {
-      const v = r / (V - 1);
-      rings.push(OUT.map(function (p, i) {
-        const sign = i <= M ? 1 : -1;
-        return upperPoint(p.x, sign, v);
-      }));
-    }
-    gUpper.add(mesh(buildFromRings(rings), matKnit));
-  })();
-
-  /* ---- collar rim + dark interior ---- */
-  // Runs the opening's perimeter: out along the lateral edge, back along the medial.
-  function collarRim(t) { // t 0..1 — matches upperPoint(x, ±1, 1) exactly
-    const fwd = t < 0.5;
-    const u = fwd ? t * 2 : (1 - t) * 2;
-    const x = THROAT_X0 + (THROAT_X1 - THROAT_X0) * u;
-    return new THREE.Vector3(x, midTop(x) + topH(x), (fwd ? 1 : -1) * collarHalfW(x));
-  }
-  (function () {
-    const pts = [];
-    for (let i = 0; i < 72; i++) pts.push(collarRim(i / 72));
-    const curve = new THREE.CatmullRomCurve3(pts, true, "catmullrom", 0.5);
-    gUpper.add(mesh(new THREE.TubeGeometry(curve, 220, 0.027, 9, true), matCollar));
-
-    // interior funnel, tapering toward a point back in the heel
-    const FX = -0.40, ringsIn = [];
-    [[0.99, -0.010], [0.86, -0.09], [0.68, -0.17], [0.48, -0.24], [0.26, -0.31], [0.04, -0.37]].forEach(function (st) {
-      const s = st[0], dy = st[1];
-      const ring = [];
-      for (let i = 0; i < 96; i++) {
-        const p = collarRim(i / 96);
-        ring.push(new THREE.Vector3(FX + (p.x - FX) * s, p.y + dy, p.z * s));
-      }
-      ringsIn.push(ring);
-    });
-    const inMesh = new THREE.Mesh(buildFromRings(ringsIn), matInner);
-    inMesh.receiveShadow = true;
-    gUpper.add(inMesh);
-  })();
-
-  /* ---- heel counter + toe cap overlays ---- */
-  function patch(x0, x1, v0, v1, sign, lift, steps) {
-    const S = steps || 16, V = 10;
-    const rings = [];
-    for (let r = 0; r <= V; r++) {
-      const v = v0 + (v1 - v0) * (r / V);
-      const ring = [];
-      for (let i = 0; i <= S; i++) {
-        const t = i / S;
-        const x = x0 + (x1 - x0) * t;
-        const edge = Math.sin(Math.PI * Math.min(1, Math.max(0, t))) ;
-        const p = upperPoint(x, sign, v);
-        const n = upperNormal(x, sign, v);
-        p.addScaledVector(n, lift * (0.35 + 0.65 * edge));
-        ring.push(p);
-      }
-      rings.push(ring);
-    }
-    // open strip: build indices manually (not a closed loop)
-    const R = rings.length, P = rings[0].length;
-    const pos = new Float32Array(R * P * 3), uv = new Float32Array(R * P * 2), idx = [];
-    let o = 0, o2 = 0;
-    for (let r = 0; r < R; r++) for (let i = 0; i < P; i++) {
-      const p = rings[r][i];
-      pos[o++] = p.x; pos[o++] = p.y; pos[o++] = p.z;
-      uv[o2++] = i / (P - 1); uv[o2++] = r / (R - 1);
-    }
-    for (let r = 0; r < R - 1; r++) for (let i = 0; i < P - 1; i++) {
-      const a = r * P + i, b = r * P + i + 1, c = (r + 1) * P + i + 1, d = (r + 1) * P + i;
-      idx.push(a, b, c, a, c, d);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-    g.setIndex(idx); g.computeVertexNormals();
-    return g;
-  }
-
-  [1, -1].forEach(function (sign) {
-    gUpper.add(mesh(patch(-1.355, -0.80, 0.015, 0.60, sign, 0.009, 18), matOverlay));  // heel counter
-    gUpper.add(mesh(patch(0.94, 1.372, 0.015, 0.52, sign, 0.009, 16), matOverlay));    // toe cap
-    // twin hairline stripes
-    gUpper.add(mesh(patch(-1.00, 0.58, 0.300, 0.336, sign, 0.013, 26), matStripe));
-    gUpper.add(mesh(patch(-1.00, 0.58, 0.196, 0.232, sign, 0.013, 26), matStripe));
-  });
-
-  /* ---- tongue ---- */
-  (function () {
-    const S = 22, W = 10;
-    const X0 = -0.20, X1 = 0.44;
-    const layers = [-0.012, -0.064];   // top face, then underside
-    const grid = [];
-    for (let li = 0; li < 2; li++) {
-      for (let s = 0; s <= S; s++) {
-        const t = s / S;
-        const x = X0 + (X1 - X0) * t;
-        const hw = Math.max(0.052, collarHalfW(x) * 0.92);   // fills the slot
-        const ring = [];
-        for (let i = 0; i <= W; i++) {
-          const w = -1 + 2 * (i / W);
-          const y = midTop(x) + topH(x) + layers[li] - 0.030 * w * w;
-          ring.push(new THREE.Vector3(x, y, w * hw));
-        }
-        grid.push(ring);
-      }
-    }
-    const R = grid.length, P = grid[0].length;
-    const pos = new Float32Array(R * P * 3), uv = new Float32Array(R * P * 2), idx = [];
-    let o = 0, o2 = 0;
-    for (let r = 0; r < R; r++) for (let i = 0; i < P; i++) {
-      const p = grid[r][i];
-      pos[o++] = p.x; pos[o++] = p.y; pos[o++] = p.z;
-      uv[o2++] = i / (P - 1); uv[o2++] = r / (R - 1);
-    }
-    const half = S + 1;
-    for (let li = 0; li < 2; li++) {
-      for (let s = 0; s < S; s++) for (let i = 0; i < P - 1; i++) {
-        const base = li * half;
-        const a = (base + s) * P + i, b = (base + s) * P + i + 1,
-              c = (base + s + 1) * P + i + 1, d = (base + s + 1) * P + i;
-        idx.push(a, b, c, a, c, d);
-      }
-    }
-    // side walls joining the two layers
-    for (let s = 0; s < S; s++) {
-      [0, P - 1].forEach(function (i) {
-        const a = s * P + i, b = (s + 1) * P + i, c = (half + s + 1) * P + i, d = (half + s) * P + i;
-        idx.push(a, b, c, a, c, d);
-      });
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-    g.setIndex(idx); g.computeVertexNormals();
-    gUpper.add(mesh(g, matTongue));
-  })();
-
-  /* ---- laces ---- */
-  (function () {
-    const eye = [0.40, 0.285, 0.170, 0.050, -0.070, -0.195];
-    for (let i = 0; i < eye.length - 1; i++) {
-      [[1, -1], [-1, 1]].forEach(function (dir) {
-        const a = upperPoint(eye[i], dir[0], 0.95);
-        const b = upperPoint(eye[i + 1], dir[1], 0.95);
-        const xm = (eye[i] + eye[i + 1]) * 0.5;
-        const m = new THREE.Vector3(xm, midTop(xm) + topH(xm) + 0.024, 0);
-        const c = new THREE.CatmullRomCurve3([a, m, b], false, "catmullrom", 0.4);
-        gUpper.add(mesh(new THREE.TubeGeometry(c, 30, 0.0165, 7, false), matLace));
-      });
-    }
-    // heel pull tab
-    const ht = [
-      upperPoint(-1.20, 0.4, 0.62),
-      new THREE.Vector3(-1.30, midTop(-1.28) + topH(-1.28) + 0.10, 0),
-      upperPoint(-1.20, -0.4, 0.62)
-    ];
-    gUpper.add(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ht, false, "catmullrom", 0.5), 24, 0.022, 7, false), matStripe));
-  })();
-
-  /* ---- live colourway swap ---- */
-  const targets = new Map();
-  function paint(mat, hex) { targets.set(mat, new THREE.Color(hex)); }
-  window.__applyColorway = function (cw) {
-    paint(matKnit, cw.knit); paint(matOverlay, cw.overlay);
-    paint(matMid, cw.midsole); paint(matMid2, cw.mid2);
-    paint(matPlate, cw.plate); paint(matOutsole, cw.outsole);
-    if (matOutsole.userData.pod) paint(matOutsole.userData.pod, cw.outsole);
-    paint(matCollar, cw.collar); paint(matTongue, cw.tongue);
-    paint(matStripe, cw.stripe); paint(matLace, cw.lace);
-    matStripe.emissive.set(cw.stripe);
-    swirls[0].material.color.set(cw.stripe);
-    glows.forEach(function (g) { g.material.color.set(cw.stripe); });
-    under.color.set(cw.stripe);
-  };
-
-  /* =====================================================================
-     Scroll choreography
-  ===================================================================== */
+  /* ================= choreography =================
+     A photograph can't turn, so the shot is posed instead: it slides, scales,
+     tilts in perspective and parallaxes against the backdrop. */
   const KEYS = [
-    { at: 0.00, ry: -0.60, rx:  0.09, rz:  0.06, px:  0.26, py:  0.05, sc: 1.00, ex: 0, sh: 1.00, at2: 1.00 },
-    { at: 1.00, ry:  0.00, rx:  0.00, rz:  0.00, px:  0.34, py: -0.02, sc: 1.08, ex: 0, sh: 1.00, at2: 0.85 },
-    { at: 1.55, ry: -0.34, rx: -0.22, rz:  0.00, px:  0.28, py:  0.00, sc: 1.05, ex: 0.16, sh: 0.70, at2: 0.70 },
-    { at: 2.00, ry:  0.36, rx: -0.84, rz:  0.10, px: -0.34, py:  0.02, sc: 0.95, ex: 1.00, sh: 0.16, at2: 0.55 },
-    { at: 2.55, ry: -0.72, rx: -0.34, rz:  0.04, px: -0.34, py:  0.00, sc: 1.00, ex: 0.44, sh: 0.50, at2: 0.75 },
-    { at: 3.00, ry: -1.58, rx:  0.07, rz: -0.04, px: -0.36, py:  0.00, sc: 1.08, ex: 0, sh: 1.00, at2: 1.00 },
-    { at: 3.50, ry: -3.10, rx:  0.06, rz:  0.00, px: -0.36, py:  0.00, sc: 1.08, ex: 0, sh: 1.00, at2: 1.00 },
-    { at: 4.00, ry: -4.34, rx:  0.38, rz:  0.06, px:  0.32, py:  0.06, sc: 0.86, ex: 0, sh: 0.78, at2: 0.72 },
-    { at: 5.00, ry: -5.76, rx:  0.08, rz:  0.05, px:  0.10, py:  0.03, sc: 1.12, ex: 0, sh: 1.00, at2: 1.00 }
+    { at:0.00, x: 16, y:  1, sc:1.00, rot:-3.0, tilt: 10, call:0, atm:1.00 },
+    { at:1.00, x: 19, y: -1, sc:1.14, rot: 0.0, tilt:  0, call:0, atm:0.86 },
+    { at:1.62, x:-15, y:  0, sc:1.16, rot: 0.0, tilt:  0, call:1, atm:0.55 },
+    { at:2.38, x:-15, y:  0, sc:1.16, rot: 0.0, tilt:  0, call:1, atm:0.55 },
+    { at:3.00, x:-18, y:  0, sc:1.10, rot: 3.0, tilt:-10, call:0, atm:1.00 },
+    { at:4.00, x: 18, y:  4, sc:0.80, rot:-6.0, tilt: 16, call:0, atm:0.80 },
+    { at:5.00, x:  5, y:  0, sc:1.18, rot:-3.0, tilt:  8, call:0, atm:1.00 }
   ];
-  const FIELDS = ["ry", "rx", "rz", "px", "py", "sc", "ex", "sh", "at2"];
-  const poseTarget = {}, poseNow = {};
-  FIELDS.forEach(function (f) { poseTarget[f] = KEYS[0][f]; poseNow[f] = KEYS[0][f]; });
-
-  function samplePose(idx) {
-    if (idx <= KEYS[0].at) return KEYS[0];
+  const F = ["x","y","sc","rot","tilt","call","atm"];
+  const now = {}, tgt = {};
+  F.forEach(f => { now[f] = KEYS[0][f]; tgt[f] = KEYS[0][f]; });
+  function sample(i) {
+    if (i <= KEYS[0].at) return KEYS[0];
     const last = KEYS.length - 1;
-    if (idx >= KEYS[last].at) return KEYS[last];
-    for (let i = 0; i < last; i++) {
-      if (idx <= KEYS[i + 1].at) {
-        const a = KEYS[i], b = KEYS[i + 1];
-        const t = (idx - a.at) / (b.at - a.at), s = t * t * (3 - 2 * t);
-        const o = {};
-        FIELDS.forEach(function (f) { o[f] = a[f] + (b[f] - a[f]) * s; });
+    if (i >= KEYS[last].at) return KEYS[last];
+    for (let k = 0; k < last; k++) {
+      if (i <= KEYS[k + 1].at) {
+        const a = KEYS[k], b = KEYS[k + 1];
+        const t = (i - a.at) / (b.at - a.at), s = t * t * (3 - 2 * t), o = {};
+        F.forEach(f => { o[f] = a[f] + (b[f] - a[f]) * s; });
         return o;
       }
     }
     return KEYS[last];
   }
-  shoe.rotation.order = "YXZ";
 
-  let tmx = 0, tmy = 0, mx = 0, my = 0;
-  if (!reduced) {
-    window.addEventListener("pointermove", function (e) {
-      tmx = (e.clientX / window.innerWidth - 0.5) * 2;
-      tmy = (e.clientY / window.innerHeight - 0.5) * 2;
-    }, { passive: true });
+  const wrap = document.getElementById("shoeWrap");
+  const calls = document.getElementById("callouts");
+  const glow = document.getElementById("glow");
+  const swirls = document.getElementById("swirls");
+  let mx = 0, my = 0, tmx = 0, tmy = 0, narrow = false;
+  if (!reduced) window.addEventListener("pointermove", function (e) {
+    tmx = (e.clientX / window.innerWidth - 0.5) * 2;
+    tmy = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
+
+  /* ================= backdrop canvas ================= */
+  const cv = document.getElementById("sky"), ctx = cv.getContext("2d");
+  let W = 0, H = 0, dpr = 1, city = null, sparks = [];
+  function buildCity() {
+    const COLS = Math.round(W / 13) + 2, cw = W / (COLS - 1);
+    const off = document.createElement("canvas");
+    off.width = Math.max(1, Math.round(W * dpr)); off.height = Math.max(1, Math.round(H * dpr));
+    const c = off.getContext("2d"); c.scale(dpr, dpr);
+    const base = H * 0.86, step = 11;
+    for (let i = 0; i < COLS; i++) {
+      const hgt = (0.06 + Math.pow(Math.random(), 1.9) * 0.62) * H;
+      const x = i * cw;
+      for (let y = base; y > base - hgt; y -= step) {
+        if (Math.random() < 0.28) continue;
+        const d = 0.30 + Math.random() * 0.70;
+        c.fillStyle = Math.random() < 0.09
+          ? "rgba(255," + (120 + Math.random() * 40 | 0) + ",50," + (d * 0.55).toFixed(2) + ")"
+          : "rgba(" + (40 + Math.random() * 30 | 0) + ",150,255," + (d * 0.48).toFixed(2) + ")";
+        c.fillRect(x, y, 3, 3);
+      }
+    }
+    city = off;
   }
-
-  let w = 0, h = 0, narrow = false;
+  function buildSparks() {
+    sparks = [];
+    const n = Math.min(150, Math.round(W * H / 14000));
+    for (let i = 0; i < n; i++) sparks.push({
+      x: Math.random() * W, y: Math.random() * H,
+      r: 0.6 + Math.random() * 1.5, v: 4 + Math.random() * 16,
+      p: Math.random() * 6.28, a: 0.25 + Math.random() * 0.6
+    });
+  }
   function resize() {
-    w = window.innerWidth; h = window.innerHeight;
-    narrow = w < 900;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    const target = narrow ? 3.40 : 4.70;
-    const dist = target / (2 * camera.aspect * Math.tan((camera.fov * Math.PI / 180) / 2));
-    camera.position.set(0, 0.26, Math.min(12, Math.max(4.8, dist)));
-    camera.lookAt(0, 0.0, 0);
-    camera.updateProjectionMatrix();
+    W = window.innerWidth; H = window.innerHeight; narrow = W < 860;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildCity(); buildSparks();
   }
   resize();
-  window.addEventListener("resize", resize);
+  let rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(resize, 180); });
 
-  const clock = new THREE.Clock();
-  function damp(a, b, l, dt) { return b + (a - b) * Math.exp(-l * dt); }
+  /* ================= loop ================= */
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min(0.05, (t - last) / 1000); last = t;
+    const p = sample(stageIndex);
+    const L = reduced ? 60 : 7;
+    F.forEach(f => { tgt[f] = p[f]; now[f] = tgt[f] + (now[f] - tgt[f]) * Math.exp(-L * dt); });
+    mx += (tmx - mx) * (1 - Math.exp(-4 * dt));
+    my += (tmy - my) * (1 - Math.exp(-4 * dt));
 
-  function frame() {
-    const dt = Math.min(0.05, clock.getDelta());
-    const time = clock.elapsedTime;
+    const bob = reduced ? 0 : Math.sin(t / 1000 * 0.62) * 0.5;
+    const tx = (narrow ? 0 : now.x) + mx * 1.1;
+    const ty = now.y + bob + my * 0.7;
+    wrap.style.transform =
+      "perspective(1400px) translate3d(" + tx.toFixed(2) + "%," + ty.toFixed(2) + "%,0)" +
+      " rotateY(" + (now.tilt + mx * 2.2).toFixed(2) + "deg)" +
+      " rotate(" + now.rot.toFixed(2) + "deg)" +
+      " scale(" + (now.sc * (narrow ? 0.86 : 1)).toFixed(3) + ")";
+    calls.style.transform = wrap.style.transform;
+    calls.style.opacity = now.call.toFixed(2);
 
-    const p = samplePose(stageIndex);
-    FIELDS.forEach(function (f) { poseTarget[f] = p[f]; });
-    const L = reduced ? 40 : 7.0;
-    FIELDS.forEach(function (f) { poseNow[f] = damp(poseNow[f], poseTarget[f], L, dt); });
-    mx = damp(mx, tmx, 4, dt); my = damp(my, tmy, 4, dt);
+    glow.style.opacity = (0.55 + 0.45 * now.atm).toFixed(2);
+    swirls.style.opacity = (0.30 + 0.55 * now.atm).toFixed(2);
 
-    const breathe = reduced ? 0 : Math.sin(time * 0.40) * 0.045;
-    const bob = reduced ? 0 : Math.sin(time * 0.62) * 0.013;
-
-    shoe.rotation.y = poseNow.ry + breathe + mx * 0.11;
-    shoe.rotation.x = poseNow.rx + my * -0.06;
-    shoe.rotation.z = poseNow.rz;
-    shoe.position.set(narrow ? 0 : poseNow.px, poseNow.py + bob, 0);
-    shoe.scale.setScalar(poseNow.sc * (narrow ? 0.90 : 1));
-
-    const e = poseNow.ex;
-    gUpper.position.y = 0.56 * e;
-    gMid.position.y = 0.13 * e;
-    gPlate.position.y = -0.17 * e;
-    gOut.position.y = -0.44 * e;
-
-    shadowMat.opacity = 0.5 * Math.max(0, poseNow.sh);
-
-    // atmosphere follows the shoe and fades where it would clutter
-    atmos.position.x = shoe.position.x * 0.6;
-    const a2 = poseNow.at2;
-    glows.forEach(function (g, i) {
-      g.material.opacity = [0.30, 0.24, 0.18][i] * a2;
-      g.scale.setScalar([4.2, 2.4, 2.0][i] * (1 + (reduced ? 0 : Math.sin(time * 0.7 + i) * 0.05)));
-    });
-    sparks.material.opacity = 0.85 * a2;
-    grid.material.opacity = 0.5 * a2;
-
-    // the backdrop sits deeper, so it parallaxes less and stays lit throughout
-    const deep = 0.55 + 0.45 * a2;
-    city.material.opacity = cityBase * deep * (reduced ? 1 : 1 + Math.sin(time * 0.55) * 0.05);
-    city.position.x = -shoe.position.x * 0.22 - mx * 0.30;
-    city.position.y = -my * 0.14;
-    streaks.forEach(function (s, i) {
-      s.material.opacity = s.userData.base * deep;
-      if (!reduced) {
-        s.position.x = s.userData.drift + Math.sin(time * (0.11 + i * 0.03) + i) * 1.5;
-        s.position.y += Math.sin(time * 0.4 + i * 2) * dt * 0.05;
-      }
-    });
-    swirls.forEach(function (s, i) {
-      s.material.opacity = [0.30, 0.22, 0.16][i] * a2;
-      if (!reduced) {
-        s.rotation.y = time * (0.22 + i * 0.13) * (i % 2 ? -1 : 1);
-        s.rotation.z = Math.sin(time * 0.3 + i) * 0.14;
-      }
-    });
-    if (!reduced) {
-      const sp = sparkGeo.attributes.position;
-      for (let i = 0; i < sparkCount; i++) {
-        const ph = sparkSeed[i * 3], sp2 = sparkSeed[i * 3 + 1];
-        sp.array[i * 3 + 1] += sp2 * dt * 0.16;
-        if (sp.array[i * 3 + 1] > 1.9) sp.array[i * 3 + 1] = -0.62;
-        sp.array[i * 3] += Math.sin(time * 0.5 + ph) * dt * 0.04;
-      }
-      sp.needsUpdate = true;
-      shards.forEach(function (m, i) { m.rotation.y += dt * (0.05 + i * 0.012); });
+    ctx.clearRect(0, 0, W, H);
+    if (city) {
+      ctx.globalAlpha = 0.55 + 0.45 * now.atm;
+      ctx.drawImage(city, -now.x * 0.9 - mx * 14, -my * 8, W, H);
+      ctx.globalAlpha = 1;
     }
-
-    targets.forEach(function (col, mat) {
-      mat.color.lerp(col, 1 - Math.exp(-6 * dt));
-      if (mat.color.getHex() === col.getHex()) targets.delete(mat);
-    });
-
-    renderer.render(scene, camera);
+    const ts = t / 1000;
+    for (const s of sparks) {
+      if (!reduced) {
+        s.y -= s.v * dt;
+        if (s.y < -8) { s.y = H + 8; s.x = Math.random() * W; }
+      }
+      const a = s.a * (0.55 + 0.45 * Math.sin(ts * 1.4 + s.p)) * now.atm;
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(255," + (150 + Math.sin(s.p) * 40 | 0) + ",90," + a.toFixed(3) + ")";
+      ctx.arc(s.x + Math.sin(ts * 0.5 + s.p) * 6 - mx * 10, s.y, s.r, 0, 6.283);
+      ctx.fill();
+    }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
